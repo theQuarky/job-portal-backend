@@ -13,11 +13,10 @@ export default function authentication(req:IRequest, res:IResponse, next:NextFun
       const bearerToken = bearer[1];
       // Set the token
       req.token = bearerToken;
-      // Next middleware
       next();
   } else {
       // Forbidden
-      res.sendStatus(403);
+      res.boom.forbidden("Plaese login");
   }
 }
 

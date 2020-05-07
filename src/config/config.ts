@@ -4,10 +4,10 @@ const DB_HOST = "sql12.freesqldatabase.com";
 const PASS = "dgThsrJ8ep";
 const DB_USER = "sql12338029";
 const DB_NAME = "sql12338029";
-const DB_URLSTRING = "mysql://"+DB_USER+":"+PASS+"@"+DB_HOST+"/"+DB_NAME+"?debug=true&reconnect=true";
+const DB_URLSTRING = process.env.DB_URL || "mysql://"+DB_USER+":"+PASS+"@"+DB_HOST+"/"+DB_NAME+"?debug=true&reconnect=true";
 const CONFIG = {
   APP: process.env.APP || 'development',
-  PORT: process.env.PORT || '3000',
+  PORT: process.env.PORT || '8000',
   DB_URL: process.env.DB_URL || DB_URLSTRING,
 
   JWT_ENCRYPTION: process.env.JWT_ENCRYPTION || 'jwt_screate_key',
