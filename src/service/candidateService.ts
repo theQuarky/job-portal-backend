@@ -132,12 +132,16 @@ export const validLoginCredentials: express.RequestHandler = (req: IRequest, res
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
     const password = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex');
-    connection.query("SELECT id,`full-name`,`user-name`,`phone-number`,`email-id` FROM candidate WHERE `email-id`= '" + params.userName + "' or `user-name`= '" + params.userName + "' and password= '" + password + "'",
+    connection.query("SELECT id,`full-name`,`user-name`,`phone-number`,`email-id` FROM candidate WHERE `user-name`= '" + params.userName + "' and password= '" + password + "'",
         function (error, results, fields) {
             if (error) throw error;
-            console.log(results);
-            req.candidate = results;
-            return next();
+            if(_.isEmpty(results)){
+                const err = new Error("Password or username is worng");
+                return res.send(Boom.boomify(err, { statusCode: 400 }));
+            }else{
+                req.candidate = results;
+                return next();
+            }
         });
 }
 
