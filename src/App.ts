@@ -4,7 +4,7 @@ import * as express from 'express';
 import apiV1 from './api/index';
 import * as errorHandler from './helpers/errorHandler';
 const boom = require('express-boom');
-import connection  from './config/db';
+import connection from './config/db';
 import IRequest from './interface/IRequest';
 import IResponse from './interface/IResponse';
 import { NextFunction } from 'express';
@@ -12,7 +12,7 @@ import * as _ from 'lodash';
 
 class App {
   public express: express.Application;
- 
+
   constructor() {
     this.express = express();
     this.setMiddleware();
@@ -25,10 +25,10 @@ class App {
     this.express.use(cors());
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
-    this.express.use(express.static(__dirname+'/uploads'));
+    this.express.use(express.static(__dirname + '/uploads'));
     this.express.use(cors());
     this.express.use(boom());
-    this.express.use((req:IRequest, res:IResponse, next:NextFunction)=>{
+    this.express.use((req: IRequest, res: IResponse, next: NextFunction) => {
       const params = _.merge(req.body, req.params);
       console.table(params);
       return next();
@@ -44,10 +44,13 @@ class App {
     this.express.use(errorHandler.internalServerError);
   }
 
-  private connectToDatebase(): void{
-    connection.connect(function(err) {
-      if (err) throw err
-      console.log('You are now connected with mysql database...')
+  private connectToDatebase(): void {
+    connection.connect(function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('You are now connected with mysql database...')
+      }
     });
   }
 }

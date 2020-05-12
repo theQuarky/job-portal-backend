@@ -49,7 +49,7 @@ export const validateData: express.RequestHandler = (req: IRequest, res: IRespon
 export const findEmployerByEmail: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
 
-    connection.query('SELECT * FROM employer WHERE `email-id` = "' + params.emailId.trim() + '"', function (error, result, fields) {
+    connection.query('SELECT * FROM employer WHERE `email-id` = "' + params.emailId.trim() + '" and del=0', function (error, result, fields) {
         if (error) {
             console.log("error", error);
         } else {
@@ -66,7 +66,7 @@ export const findEmployerByEmail: express.RequestHandler = (req: IRequest, res: 
 export const findEmployerByUserName: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
 
-    connection.query('SELECT * FROM employer WHERE `user-name` = "' + params.userName.trim() + '"', function (error, result, fields) {
+    connection.query('SELECT * FROM employer WHERE `user-name` = "' + params.userName.trim() + '" and del=0', function (error, result, fields) {
         if (error) {
             console.log("error", error);
         } else {
@@ -84,7 +84,7 @@ export const findEmployerByUserName: express.RequestHandler = (req: IRequest, re
 export const findEmployerByPhoneNumber: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
 
-    connection.query('SELECT * FROM employer WHERE `phone-number` = "' + params.phoneNumber + '"', function (error, result, fields) {
+    connection.query('SELECT * FROM employer WHERE `phone-number` = "' + params.phoneNumber + '" and del=0', function (error, result, fields) {
         if (error) {
             console.log("error", error);
         } else {

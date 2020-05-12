@@ -1,10 +1,11 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-const DB_HOST = "sql12.freesqldatabase.com";
-const PASS = "dgThsrJ8ep";
-const DB_USER = "sql12338029";
-const DB_NAME = "sql12338029";
-const DB_URLSTRING = process.env.DB_URL || "mysql://"+DB_USER+":"+PASS+"@"+DB_HOST+"/"+DB_NAME+"?debug=true&reconnect=true";
+const DB_HOST = "localhost";
+const PASS = "toor";
+const DB_USER = "root";
+const DB_NAME = "myoptjobs";
+
+const DB_URLSTRING = process.env.DB_URL || "mysql://root:toor@localhost:3306/myoptjobs?debug=true&charset=BIG5_CHINESE_CI&timezone=-0700";//"mysql://"+DB_USER+":"+PASS+"@"+DB_HOST+"/"+DB_NAME+"?debug=true&reconnect=true";
 const CONFIG = {
   APP: process.env.APP || 'development',
   PORT: process.env.PORT || '8000',
