@@ -1,6 +1,6 @@
-import * as mysql from 'mysql';
+import {Sequelize} from 'sequelize';
 import CONFIG from './config';
 
-const connection = mysql.createConnection(CONFIG.DB_URL);
+const sequelize:Sequelize = new Sequelize(CONFIG.DB_URL);
 
-export default connection;
+export default sequelize;

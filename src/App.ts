@@ -4,7 +4,7 @@ import * as express from 'express';
 import apiV1 from './api/index';
 import * as errorHandler from './helpers/errorHandler';
 const boom = require('express-boom');
-import connection from './config/db';
+import sequelize from './config/db';
 import IRequest from './interface/IRequest';
 import IResponse from './interface/IResponse';
 import { NextFunction } from 'express';
@@ -45,13 +45,14 @@ class App {
   }
 
   private connectToDatebase(): void {
-    connection.connect(function (err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('You are now connected with mysql database...')
-      }
-    });
+    sequelize.sync({force:false});
+    sequelize.authenticate()
+      .then(() => {
+        console.log('Connection has been established successfully.');
+      })
+      .catch(err => {
+        console.error('Unable to connect to the database:', err);
+      });
   }
 }
 

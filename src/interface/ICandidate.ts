@@ -4,5 +4,5 @@ export interface ICandidate {
     "user-name"?: string,
     "phone-number"?: number,
     "email-id"?: string,
-    "password"?: string
+    "password"?: string,
 }

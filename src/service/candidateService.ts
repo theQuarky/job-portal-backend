@@ -4,10 +4,10 @@ import IResponse from '../interface/IResponse';
 import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
-import connection from '../config/db';
 import CONFIG from '../config/config';
 import { ICandidate } from '../interface/ICandidate';
 import Boom = require('boom');
+import CandidateModel from '../models/CandidateModel';
 
 export const validateData: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
@@ -46,59 +46,75 @@ export const validateData: express.RequestHandler = (req: IRequest, res: IRespon
     return next();
 }
 
-export const findCandidateByEmail: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const findCandidateByEmail: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-
-    connection.query('SELECT * FROM candidate WHERE `email-id` = "' + params.emailId.trim() + '" and del=0', function (error, result, fields) {
-        if (error) {
-            console.log("error", error);
+    try {
+        const data: ICandidate | any = await CandidateModel.findAll({
+            where: {
+                'email-id': params.emailId
+            },
+            attributes: ['id']
+        });
+        if (_.isEmpty(data) === false) {
+            const err = new Error("Email id is used!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
         } else {
-            if (!_.isEmpty(result)) {
-                const err = new Error("Email id is already taken!");
-                return res.send(Boom.boomify(err, { statusCode: 400 }));
-            } else {
-                return next();
-            }
+            return next();
         }
-    });
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
 }
 
-export const findCandidateByUserName: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const findCandidateByUserName: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-
-    connection.query('SELECT * FROM candidate WHERE `user-name` = "' + params.userName.trim() + '" and del=0', function (error, result, fields) {
-        if (error) {
-            console.log("error", error);
+    try {
+        const data: ICandidate | any = await CandidateModel.findAll({
+            where: {
+                'user-name': params.userName
+            },
+            attributes: ['id']
+        });
+        if (_.isEmpty(data) === false) {
+            const err = new Error("Username is taken!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
         } else {
-            if (!_.isEmpty(result)) {
-                console.log(result);
-                const err = new Error("User name is already taken!");
-                return res.send(Boom.boomify(err, { statusCode: 400 }));
-            } else {
-                return next();
-            }
+            return next();
         }
-    });
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
 }
 
-export const findCandidateByPhoneNumber: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const findCandidateByPhoneNumber: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
+    try {
+        const data: ICandidate | any = await CandidateModel.findAll({
+            where: {
+                'phone-number': params.phoneNumber
+            },
+            attributes: ['id']
+        });
 
-    connection.query('SELECT * FROM candidate WHERE `phone-number` = "' + params.phoneNumber + '" and del=0', function (error, result, fields) {
-        if (error) {
-            console.log("error", error);
+        if (_.isEmpty(data) === false) {
+            const err = new Error("Phone number is used!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
         } else {
-            if (!_.isEmpty(result)) {
-                const err = new Error("This phone number is already used!");
-                return res.send(Boom.boomify(err, { statusCode: 400 }));
-            } else {
-                return next();
-            }
+            return next();
         }
-    });
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+
 }
 
-export const addCandidate: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const addCandidate: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
 
     const candidateData: ICandidate = {
@@ -108,23 +124,21 @@ export const addCandidate: express.RequestHandler = (req: IRequest, res: IRespon
         'email-id': params.emailId,
         'password': crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex')
     }
-
-    connection.query('INSERT INTO candidate SET ?', candidateData,
-        function (error, results, fields) {
-            if (error) throw error;
-
-            candidateData.id = results.insertId;
-            req.candidate = candidateData;
-
-            return next();
-        });
+    try {
+        const data = await CandidateModel.create(candidateData);
+        req.candidate = data;
+        return next();
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
+    }
 }
 
-export const validLoginCredentials: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const validLoginCredentials: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params = _.merge(req.body, req.params);
 
     if (_.isEmpty(params.userName)) {
-        const err = new Error("Enter username or emaild");
+        const err = new Error("Enter username or email id");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
     if (_.isEmpty(params.password)) {
@@ -132,22 +146,31 @@ export const validLoginCredentials: express.RequestHandler = (req: IRequest, res
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
     const password = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex');
-    connection.query("SELECT id,`full-name`,`user-name`,`phone-number`,`email-id` FROM candidate WHERE `user-name`= '" + params.userName + "' and password= '" + password + "'",
-        function (error, results, fields) {
-            if (error) throw error;
-            if(_.isEmpty(results)){
-                const err = new Error("Password or username is worng");
-                return res.send(Boom.boomify(err, { statusCode: 400 }));
-            }else{
-                req.candidate = results;
-                return next();
-            }
+
+    try {
+        const data: ICandidate | any = await CandidateModel.findOne({
+            where: {
+                'user-name': params.userName,
+                'password': password
+            },
+            raw: true
         });
+        if(_.isEmpty(data)){
+            const err = new Error("Username and password is not matching!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        }
+        req.candidate = data;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
 }
 
 export const generateToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const candidate = req.candidate;
     req.token = jwt.sign(JSON.stringify(candidate), CONFIG.JWT_ENCRYPTION);
-    console.log(req.token)
-    return next()
+    console.log(req.token);
+    return next();
 }

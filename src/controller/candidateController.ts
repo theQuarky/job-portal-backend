@@ -6,14 +6,14 @@ import IResponse from '../interface/IResponse';
 export const sendCandidate: express.RequestHandler = (req:IRequest, res:IResponse, next:express.NextFunction)=> {
     console.log(req.candidate);
     return res.send({
-        message: "candidate registed successfully",
+        message: "candidate registered successfully",
         data: req.candidate
     });
 }
 
 export const sendLoginToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     res.send({
-        data: req.candidate[0],
+        data: req.candidate,
         token: req.token
     });
 }
