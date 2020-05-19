@@ -90,11 +90,11 @@ exports.findCandidateByPhoneNumber = function (req, res, next) {
 exports.addCandidate = function (req, res, next) {
     var params = _.merge(req.params, req.body);
     var candidateData = {
-        'full-name': params.fullName,
-        'user-name': params.userName,
-        'phone-number': params.phoneNumber,
-        'email-id': params.emailId,
-        'password': crypto.createHmac('sha256', config_1.default.SHA_KEY).update(params.password.trim()).digest('hex')
+        fullName: params.fullName,
+        userName: params.userName,
+        phoneNumber: params.phoneNumber,
+        emailId: params.emailId,
+        password: crypto.createHmac('sha256', config_1.default.SHA_KEY).update(params.password.trim()).digest('hex')
     };
     db_1.default.query('INSERT INTO candidate SET ?', candidateData, function (error, results, fields) {
         if (error)

@@ -1,7 +1,7 @@
 import sequelize from '../config/db';
 import { INTEGER, STRING } from 'sequelize';
 import { Model, Sequelize } from 'sequelize';
-import { DATE } from 'sequelize';
+import JobModel from './JobModel';
 
 class EmployerModel extends Model { }
 
@@ -12,22 +12,26 @@ EmployerModel.init({
         autoIncrement: true,
         primaryKey: true
     },
-    'full-name': {
+    fullName: {
         type: STRING
     },
-    'user-name': {
+    userName: {
         type: STRING
     },
-    'email-id': {
+    emailId: {
         type: STRING
     },
-    'phone-number': {
+    phoneNumber: {
         type: STRING
     },
-    'password': {
+    password: {
         type: STRING
     },
-    'del': {
+    avatar:{
+        type: STRING,
+        allowNull: true
+    },
+    isDel: {
         type: INTEGER,
         defaultValue: 0
     }
@@ -37,4 +41,5 @@ EmployerModel.init({
     tableName: 'employer'
 });
 
+EmployerModel.hasMany(JobModel,{as:'employer', foreignKey: 'addedBy'});
 export default EmployerModel;

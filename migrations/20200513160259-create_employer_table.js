@@ -9,33 +9,37 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      "full-name": {
+      fullName: {
         type: DataTypes.STRING,
       },
-      "user-name": {
+      userName: {
         type: DataTypes.STRING,
       },
-      "email-id": {
+      emailId: {
         type: DataTypes.STRING,
       },
-      "phone-number": {
+      phoneNumber: {
         type: DataTypes.STRING,
       },
       password: {
         type: DataTypes.STRING,
       },
-      del: {
+      avatar: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      isDel: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
       createdAt: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.DATE
-      }
+        type: DataTypes.DATE,
+      },
     });
   },
 

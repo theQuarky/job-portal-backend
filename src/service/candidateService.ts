@@ -8,6 +8,7 @@ import CONFIG from '../config/config';
 import { ICandidate } from '../interface/ICandidate';
 import Boom = require('boom');
 import CandidateModel from '../models/CandidateModel';
+import candidate from '../api/candidateRoute';
 
 export const validateData: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
@@ -51,7 +52,7 @@ export const findCandidateByEmail: express.RequestHandler = async (req: IRequest
     try {
         const data: ICandidate | any = await CandidateModel.findAll({
             where: {
-                'email-id': params.emailId
+                emailId: params.emailId
             },
             attributes: ['id']
         });
@@ -73,7 +74,7 @@ export const findCandidateByUserName: express.RequestHandler = async (req: IRequ
     try {
         const data: ICandidate | any = await CandidateModel.findAll({
             where: {
-                'user-name': params.userName
+                userName: params.userName
             },
             attributes: ['id']
         });
@@ -95,7 +96,7 @@ export const findCandidateByPhoneNumber: express.RequestHandler = async (req: IR
     try {
         const data: ICandidate | any = await CandidateModel.findAll({
             where: {
-                'phone-number': params.phoneNumber
+                phoneNumber: params.phoneNumber
             },
             attributes: ['id']
         });
@@ -118,11 +119,11 @@ export const addCandidate: express.RequestHandler = async (req: IRequest, res: I
     const params: any = _.merge(req.params, req.body);
 
     const candidateData: ICandidate = {
-        'full-name': params.fullName,
-        'user-name': params.userName,
-        'phone-number': params.phoneNumber,
-        'email-id': params.emailId,
-        'password': crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex')
+        fullName: params.fullName,
+        userName: params.userName,
+        phoneNumber: params.phoneNumber,
+        emailId: params.emailId,
+        password: crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex')
     }
     try {
         const data = await CandidateModel.create(candidateData);
@@ -150,8 +151,8 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
     try {
         const data: ICandidate | any = await CandidateModel.findOne({
             where: {
-                'user-name': params.userName,
-                'password': password
+                userName: params.userName,
+                password: password
             },
             raw: true
         });
@@ -169,7 +170,7 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
 }
 
 export const generateToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
-    const candidate = req.candidate;
+    const candidate = {candidate: req.candidate, type: 'candidate'};
     req.token = jwt.sign(JSON.stringify(candidate), CONFIG.JWT_ENCRYPTION);
     console.log(req.token);
     return next();

@@ -1,4 +1,4 @@
-import { Router, NextFunction } from 'express';
+import { Router } from 'express';
 import * as employerController from '../controller/employerController';
 import * as employerService from '../service/employerService';
 

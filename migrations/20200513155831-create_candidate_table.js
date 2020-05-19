@@ -10,22 +10,22 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      "full-name": {
+      fullName: {
         type: DataTypes.STRING,
       },
-      "user-name": {
+      userName: {
         type: DataTypes.STRING,
       },
-      "email-id": {
+      emailId: {
         type: DataTypes.STRING,
       },
-      "phone-number": {
+      phoneNumber: {
         type: DataTypes.STRING,
       },
       password: {
         type: DataTypes.STRING,
       },
-      del: {
+      isDel: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },

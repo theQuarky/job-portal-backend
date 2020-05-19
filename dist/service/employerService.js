@@ -90,11 +90,11 @@ exports.findEmployerByPhoneNumber = function (req, res, next) {
 exports.addEmployer = function (req, res, next) {
     var params = _.merge(req.params, req.body);
     var employerData = {
-        'full-name': params.fullName,
-        'user-name': params.userName,
-        'phone-number': params.phoneNumber,
-        'email-id': params.emailId,
-        'password': crypto.createHmac('sha256', config_1.default.SHA_KEY).update(params.password.trim()).digest('hex')
+        fullName: params.fullName,
+        userName: params.userName,
+        phoneNumber: params.phoneNumber,
+        emailId: params.emailId,
+        password: crypto.createHmac('sha256', config_1.default.SHA_KEY).update(params.password.trim()).digest('hex')
     };
     db_1.default.query('INSERT INTO employer SET ?', employerData, function (error, results, fields) {
         if (error)

@@ -12,22 +12,22 @@ CandidateModel.init({
         autoIncrement: true,
         primaryKey: true
     },
-    'full-name': {
+    fullName: {
         type: STRING
     },
-    'user-name': {
+    userName: {
         type: STRING
     },
-    'email-id': {
+    emailId: {
         type: STRING
     },
-    'phone-number': {
+    phoneNumber: {
         type: STRING
     },
-    'password': {
+    password: {
         type: STRING
     },
-    'del': {
+    isDel: {
         type: INTEGER,
         defaultValue: 0
     }

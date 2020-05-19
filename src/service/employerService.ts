@@ -51,7 +51,7 @@ export const findEmployerByEmail: express.RequestHandler = async (req: IRequest,
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
-                'email-id': params.emailId
+                emailId: params.emailId
             },
             attributes: ['id']
         });
@@ -73,7 +73,7 @@ export const findEmployerByUserName: express.RequestHandler = async (req: IReque
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
-                'user-name': params.userName
+                userName: params.userName
             },
             attributes: ['id']
         });
@@ -95,7 +95,7 @@ export const findEmployerByPhoneNumber: express.RequestHandler = async (req: IRe
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
-                'phone-number': params.phoneNumber
+                phoneNumber: params.phoneNumber
             },
             attributes: ['id']
         });
@@ -118,11 +118,11 @@ export const addEmployer: express.RequestHandler = async (req: IRequest, res: IR
     const params: any = _.merge(req.params, req.body);
 
     const employerData: IEmployer = {
-        'full-name': params.fullName,
-        'user-name': params.userName,
-        'phone-number': params.phoneNumber,
-        'email-id': params.emailId,
-        'password': crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex')
+        fullName: params.fullName,
+        userName: params.userName,
+        phoneNumber: params.phoneNumber,
+        emailId: params.emailId,
+        password: crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.password.trim()).digest('hex')
     }
     try {
         const data = await EmployerModel.create(employerData);
@@ -150,8 +150,8 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
     try {
         const data: IEmployer | any = await EmployerModel.findOne({
             where: {
-                'user-name': params.userName,
-                'password': password
+                userName: params.userName,
+                password: password
             },
             raw:true
         });
@@ -169,8 +169,7 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
 }
 
 export const generateToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
-    const employer = req.employer;
+    const employer = {employer: req.employer, type: 'employer'};
     req.token = jwt.sign(JSON.stringify(employer), CONFIG.JWT_ENCRYPTION);
-    console.log(req.token)
-    return next()
+    return next();
 }
