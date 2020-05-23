@@ -7,6 +7,7 @@ import Boom = require("boom");
 import _ = require("lodash");
 import JobModel from "../models/JobModel";
 import { Op } from "sequelize";
+import EmployerModel from '../models/EmployerModel';
 
 export const validateData: express.RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const param: IJobs = _.merge(req.body, req.params);
@@ -118,7 +119,8 @@ export const getJobById: RequestHandler = async (req: IRequest, res: IResponse, 
                 isDel: {
                     [Op.not]: 1
                 }
-            }
+            },
+            include: [{ as: 'employer', model: EmployerModel }]
         });
         if (_.isNull(response)) {
             const err = new Error(`Job with id ${params.id} is not found!!`);
@@ -170,8 +172,15 @@ export const getAllJobs: RequestHandler = async (req: IRequest, res: IResponse, 
             where: {
                 isDel: {
                     [Op.not]: 1
+                },
+            },
+            include: [
+                {
+                    as: 'employer',
+                    model: EmployerModel,
+                    attributes: ['id', 'fullName', 'userName', 'phoneNumber','avatar']
                 }
-            }
+            ]
         });
         req.jobs = response;
         return next();

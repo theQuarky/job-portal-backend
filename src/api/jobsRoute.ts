@@ -30,6 +30,7 @@ jobs.get('/:id',[
 ]);
 
 jobs.put('/:id',authentication,[
+    jobServices.checkLoginType,
     jobServices.validateData,
     jobServices.makeDataPacket,
     jobServices.getJobById,
@@ -38,6 +39,7 @@ jobs.put('/:id',authentication,[
 ]);
 
 jobs.delete('/:id',authentication,[
+    jobServices.checkLoginType,
     jobServices.getJobById,
     jobServices.deleteJob,
     jobController.deleteJob

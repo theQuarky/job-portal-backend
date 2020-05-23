@@ -1,7 +1,6 @@
 import sequelize from '../config/db';
 import { INTEGER, STRING } from 'sequelize';
 import { Model, Sequelize } from 'sequelize';
-import JobModel from './JobModel';
 
 class EmployerModel extends Model { }
 
@@ -41,5 +40,4 @@ EmployerModel.init({
     tableName: 'employer'
 });
 
-EmployerModel.hasMany(JobModel,{as:'employer', foreignKey: 'addedBy'});
 export default EmployerModel;

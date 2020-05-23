@@ -9,6 +9,13 @@ import IRequest from './interface/IRequest';
 import IResponse from './interface/IResponse';
 import { NextFunction } from 'express';
 import * as _ from 'lodash';
+import JobModel from './models/JobModel';
+import ResumeModel from './models/ResumeModel';
+import EducationModel from './models/EducationModel';
+import ExperienceModel from './models/ExperienceModel';
+import CandidateModel from './models/CandidateModel';
+import EmployerModel from './models/EmployerModel';
+
 
 class App {
   public express: express.Application;
@@ -45,9 +52,19 @@ class App {
   }
 
   private connectToDatebase(): void {
-    sequelize.sync({force:false});
+    sequelize.sync({ force: false });
     sequelize.authenticate()
       .then(() => {
+
+        ExperienceModel.hasOne(ResumeModel);
+        ResumeModel.hasMany(ExperienceModel);
+
+        EducationModel.hasOne(ResumeModel);
+        ResumeModel.hasMany(EducationModel);
+
+        JobModel.hasOne(EmployerModel, { foreignKey: 'id' });
+        EmployerModel.hasMany(JobModel);
+
         console.log('Connection has been established successfully.');
       })
       .catch(err => {

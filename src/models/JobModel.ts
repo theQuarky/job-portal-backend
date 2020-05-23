@@ -5,26 +5,7 @@ import { DATE } from 'sequelize';
 import EmployerModel from './EmployerModel';
 
 class JobModel extends Model { }
-/*
-not allow null attributes
-id
-title
-category
-employmentStatus
-qualification
-deadline
-salary
-qualification
-jobDescription
-vacancy
-responsibilities
-country
-location
-companyName
-companyAddress
-companyWebsite
-companyProfile
-*/
+
 JobModel.init({
     id: {
         type: INTEGER,
@@ -108,7 +89,7 @@ JobModel.init({
         type: INTEGER,
         allowNull: false,
         references: {
-            model: 'employer',
+            model: EmployerModel,
             key: 'id'
         }
     },
@@ -126,7 +107,5 @@ JobModel.init({
     modelName: 'jobs',
     tableName: 'jobs',
 });
-
-// JobModel.belongsTo(EmployerModel, { foreignKey: 'addedBy' });
 
 export default JobModel;
