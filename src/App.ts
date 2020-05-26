@@ -56,11 +56,11 @@ class App {
     sequelize.authenticate()
       .then(() => {
 
-        ExperienceModel.hasOne(ResumeModel);
-        ResumeModel.hasMany(ExperienceModel);
+        // ExperienceModel.hasOne(ResumeModel);
+        ResumeModel.hasMany(ExperienceModel,{foreignKey:'resumeId'});
 
         EducationModel.hasOne(ResumeModel);
-        ResumeModel.hasMany(EducationModel);
+        ResumeModel.hasMany(EducationModel,{foreignKey: 'resumeId'});
 
         JobModel.hasOne(EmployerModel, { foreignKey: 'id' });
         EmployerModel.hasMany(JobModel);

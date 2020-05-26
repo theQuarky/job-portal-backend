@@ -26,9 +26,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      addedBy:{
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       resumePath: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      isDel:{
+        type: Sequelize.INTEGER,
+        allowNull:true,
+        defaultValue:0
       },
       createdAt: {
         allowNull: false,

@@ -32,9 +32,18 @@ ResumeModel.init({
         type: TEXT,
         allowNull: false
     },
+    addedBy:{
+        type:INTEGER,
+        allowNull:false
+    },
     resumePath: {
         type: STRING,
         allowNull: true
+    },
+    isDel:{
+        type: INTEGER,
+        allowNull:true,
+        defaultValue:0
     }
 }, {
     sequelize,

@@ -7,7 +7,9 @@ export interface IResume {
     location?: string;
     experienceYear?: number;
     aboutYou?: string;
+    addedBy?:number;
     resumePath?: string;
     education?: IEducation[];
     experience?: IExperience[];
+    isDel?: number; 
 }

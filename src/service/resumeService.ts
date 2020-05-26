@@ -5,6 +5,8 @@ import { IResume } from '../interface/IResume';
 import Boom = require("boom");
 import _ = require('lodash');
 import ResumeModel from '../models/ResumeModel';
+import ExperienceModel from '../models/ExperienceModel';
+import EducationModel from '../models/EducationModel';
 
 export const checkLoginType: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const type = req.data.type;
@@ -28,6 +30,11 @@ export const validateData: RequestHandler = async (req: IRequest, res: IResponse
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
 
+    // if (_.isEmpty(params.addedBy)) {
+    //     const err = new Error("Candidate id is require");
+    //     return res.send(Boom.boomify(err, { statusCode: 400 }));
+    // }
+
     return next();
 }
 
@@ -38,6 +45,7 @@ export const makeDataPacket: RequestHandler = async (req: IRequest, res: IRespon
         location: params.location || null,
         experienceYear: params.experienceYear || 0,
         aboutYou: params.aboutYou,
+        addedBy: req.data.candidate.id,
         resumePath: params.resumePath || null
     };
     req.data = dataPacket;
@@ -49,7 +57,6 @@ export const insertData: RequestHandler = async (req: IRequest, res: IResponse, 
     const data: IResume = req.data;
     try {
         const response = await ResumeModel.create(data);
-        console.log(response);
         req.resumes = response;
         return next();
     } catch (error) {
@@ -58,3 +65,152 @@ export const insertData: RequestHandler = async (req: IRequest, res: IResponse, 
         return res.send(Boom.boomify(err, { statusCode: 500 }));
     }
 }
+
+export const getAllResume: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    let fromLimit, toLimit;
+    console.log(params.fromLimit, params.toLimit);
+
+    if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
+        fromLimit = 0;
+        toLimit = 10;
+    } else {
+        fromLimit = params.fromLimit;
+        toLimit = params.toLimit
+    }
+    try {
+        const response = await ResumeModel.findAll({
+            where: {
+                isDel: 0
+            },
+            offset: parseInt(fromLimit),
+            limit: parseInt(toLimit),
+            include: [
+                { model: EducationModel },
+                { model: ExperienceModel }
+            ],
+            attributes: ["id", "fullName", "location", "experienceYear", "aboutYou", "addedBy", "resumePath"]
+        });
+        req.data = response;
+        req.resumes = response;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const getAllResumeByCandidateId: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+
+    try {
+        const response = await ResumeModel.findAll({
+            where: {
+                addedBy: parseInt(params.id),
+                isDel: 0
+            },
+            include: [
+                { model: EducationModel },
+                { model: ExperienceModel }
+            ],
+            attributes: ["id", "fullName", "location", "experienceYear", "aboutYou", "addedBy", "resumePath"]
+        });
+        req.data = response;
+        req.resumes = response;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const getAllResumeById: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    if (_.isUndefined(params.id) || !_.isInteger(parseInt(params.id))) {
+        const err = new Error("Unvalid resume id");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    try {
+        const response = await ResumeModel.findOne({
+            where: {
+                id: parseInt(params.id),
+                isDel: 0
+            },
+            include: [
+                { model: EducationModel },
+                { model: ExperienceModel }
+            ],
+            attributes: ["id", "fullName", "location", "experienceYear", "aboutYou", "addedBy", "resumePath"]
+        });
+
+        if (_.isEmpty(response) === false) {
+            req.resumes = response;
+            return next();
+        } else {
+            const err = new Error("could not found resume");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        }
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const updateResume: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    const data: IResume = req.data;
+    try {
+        const response = await ResumeModel.update(data,
+            {
+                where: {
+                    id: parseInt(params.id)
+                }
+            }
+        );
+        data.id = params.id;
+        req.resumes = data;
+        console.log(response);
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const deleteResume: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    try {
+        const response = await ResumeModel.update(
+            {
+                isDel: 1
+            },
+            {
+                where: {
+                    id: parseInt(params.id)
+                }
+            }
+        );
+        req.resumes = response;
+        console.log(response);
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const validateCandidateIdForResume: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    const checkData = req.resumes;
+    if (req.data.candidate.id !== checkData.addedBy) {
+        const err = new Error("You can not update this resume");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    return next();
+};

@@ -18,3 +18,9 @@ export const insertData: RequestHandler = (req: IRequest, res: IResponse, next: 
         education: req.educations
     });
 }
+
+export const readData: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
+    return res.json({
+        resumes: req.resumes
+    });
+}

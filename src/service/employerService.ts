@@ -8,6 +8,7 @@ import CONFIG from '../config/config';
 import { IEmployer } from '../interface/IEmployer';
 import Boom = require('boom');
 import EmployerModel from '../models/EmployerModel';
+import { Op } from 'sequelize';
 
 export const validateData: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
@@ -51,7 +52,8 @@ export const findEmployerByEmail: express.RequestHandler = async (req: IRequest,
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
-                emailId: params.emailId
+                emailId: params.emailId,
+                isDel:0
             },
             attributes: ['id']
         });
@@ -73,7 +75,8 @@ export const findEmployerByUserName: express.RequestHandler = async (req: IReque
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
-                userName: params.userName
+                userName: params.userName,
+                isDel:0
             },
             attributes: ['id']
         });
@@ -95,7 +98,8 @@ export const findEmployerByPhoneNumber: express.RequestHandler = async (req: IRe
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
-                phoneNumber: params.phoneNumber
+                phoneNumber: params.phoneNumber,
+                isDel:0
             },
             attributes: ['id']
         });
@@ -150,10 +154,31 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
     try {
         const data: IEmployer | any = await EmployerModel.findOne({
             where: {
-                userName: params.userName,
-                password: password
+                [Op.or]: [
+                    {
+                        [Op.and]: {
+                            emailId: {
+                                [Op.eq]: params.userName
+                            },
+                            password: {
+                                [Op.eq]: password
+                            }
+                        }
+                    },
+                    {
+                        [Op.and]: {
+                            userName: {
+                                [Op.eq]: params.userName
+                            },
+                            password: {
+                                [Op.eq]: password
+                            }
+                        }
+                    }
+                ],
+                isDel:0
             },
-            raw:true
+            attributes:["id","fullName","emailId","phoneNumber"]
         });
         if(_.isEmpty(data)){
             const err = new Error("Username and password is not matching!!");

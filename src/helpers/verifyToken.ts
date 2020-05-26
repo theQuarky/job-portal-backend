@@ -18,6 +18,7 @@ export default function authentication(req:IRequest, res:IResponse, next:NextFun
       const decode = jwt.verify(bearerToken,CONFIG.JWT_ENCRYPTION);
       // will send invalid jwt automatically else continue code further
       req.data = decode;
+      console.log(decode);
       return next();
   } else {
       // Forbidden

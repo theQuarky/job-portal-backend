@@ -39,9 +39,8 @@ ExperienceModel.init({
     }
 }, {
     sequelize,
-    modelName: 'experiences',
-    tableName: 'experiences'
+    modelName: 'experience',
+    tableName: 'experience'
 });
-
 
 export default ExperienceModel;
