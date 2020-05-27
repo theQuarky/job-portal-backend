@@ -4,9 +4,14 @@ import { NextFunction, RequestHandler } from "express";
 import { IResume } from '../interface/IResume';
 import Boom = require("boom");
 import _ = require('lodash');
+import * as fs from 'fs';
 import ResumeModel from '../models/ResumeModel';
 import ExperienceModel from '../models/ExperienceModel';
 import EducationModel from '../models/EducationModel';
+
+import multer = require('multer');
+
+const upload = multer({ dest: '../upload/resumes/' });
 
 export const checkLoginType: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const type = req.data.type;
@@ -128,6 +133,7 @@ export const getAllResumeByCandidateId: RequestHandler = async (req: IRequest, r
 
 export const getAllResumeById: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params = _.merge(req.params, req.body, req.query);
+
     if (_.isUndefined(params.id) || !_.isInteger(parseInt(params.id))) {
         const err = new Error("Unvalid resume id");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
@@ -207,6 +213,7 @@ export const deleteResume: RequestHandler = async (req: IRequest, res: IResponse
 
 export const validateCandidateIdForResume: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params = _.merge(req.params, req.body, req.query);
+
     const checkData = req.resumes;
     if (req.data.candidate.id !== checkData.addedBy) {
         const err = new Error("You can not update this resume");
@@ -214,3 +221,65 @@ export const validateCandidateIdForResume: RequestHandler = async (req: IRequest
     }
     return next();
 };
+
+export const uploadResume: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const file = req.file;
+
+    if(_.isUndefined(file)){
+        const err = new Error("You must have to upload resume!!");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    const fileName = file.originalname;
+
+    const extensions = ['pdf', 'doc', 'docx', 'docm', 'dotx', 'dotm', 'docb'];
+
+    const fileNameArray = fileName.split("");
+    let fileNameLength = fileNameArray.length;
+    let charFlag = fileNameArray[fileNameLength];
+    let fileExtenstion: any = [];
+
+    while (charFlag !== ".") {
+        fileNameLength = fileNameLength - 1;
+        charFlag = fileNameArray[fileNameLength];
+        fileExtenstion.push(charFlag);
+    }
+    fileExtenstion.pop();
+    fileExtenstion = fileExtenstion.reverse().join("");
+
+    if (extensions.includes(fileExtenstion) === false) {
+        const err = new Error("Invalid file");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    const tempName = Date.now() + fileName;
+    const fileDdestination = './uploads/resumes/' + tempName;
+
+    try {
+        fs.writeFileSync(fileDdestination, file.buffer.toString('base64'), { encoding: 'base64' });
+        req.resumes.resumePath = '/static/resumes/' + tempName;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+
+export const updateResumePath: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction)=>{
+    const params = _.merge(req.body, req.params);
+
+    try {
+        const response = await ResumeModel.update({resumePath: req.resumes.resumePath}, {
+            where: {
+                id: params.id
+            }
+        });
+        console.log(response);
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}

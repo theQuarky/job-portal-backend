@@ -5,7 +5,9 @@ import * as educationService from '../service/educationService';
 import * as experienceService from '../service/experienceService';
 import * as resumeController from '../controller/resumeController';
 import * as candidateService from '../service/candidateService';
+import multer = require('multer');
 
+const upload = multer();
 const resume: Router = Router();
 
 resume.post('/',authentication,[
@@ -57,7 +59,16 @@ resume.delete('/:id',authentication,[
     resumeService.getAllResumeById,
     resumeService.validateCandidateIdForResume,
     resumeService.deleteResume,
-    resumeController.tempController
+    resumeController.deleteData
+]);
+
+resume.put('/upload/:id',authentication,upload.single('resumeFile'),[
+    resumeService.checkLoginType,
+    resumeService.getAllResumeById,
+    resumeService.validateCandidateIdForResume,
+    resumeService.uploadResume,
+    resumeService.updateResumePath,
+    resumeController.resumePath
 ]);
 
 export default resume;

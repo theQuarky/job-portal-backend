@@ -25,7 +25,7 @@
         "@types/helmet": "0.0.45",
         "@types/mongoose": "^5.7.1",
         "@types/morgan": "^1.7.37",
-        "@types/multer": "^1.4.2",
+        "@types/multer": "^1.4.3",
         "@types/node": "^13.13.6",
         "@types/sequelize": "^4.28.8",
         "@types/validator": "^12.0.1",

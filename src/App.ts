@@ -16,7 +16,6 @@ import ExperienceModel from './models/ExperienceModel';
 import CandidateModel from './models/CandidateModel';
 import EmployerModel from './models/EmployerModel';
 
-
 class App {
   public express: express.Application;
 
@@ -32,7 +31,7 @@ class App {
     this.express.use(cors());
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
-    this.express.use(express.static(__dirname + '/uploads'));
+    this.express.use('/static',express.static('uploads'));
     this.express.use(cors());
     this.express.use(boom());
     this.express.use((req: IRequest, res: IResponse, next: NextFunction) => {
