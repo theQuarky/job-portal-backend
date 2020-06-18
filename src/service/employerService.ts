@@ -178,7 +178,7 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
                 ],
                 isDel:0
             },
-            attributes:["id","fullName","emailId","phoneNumber"]
+            attributes:["id","fullName","emailId","phoneNumber","userName"]
         });
         if(_.isEmpty(data)){
             const err = new Error("Username and password is not matching!!");
