@@ -11,7 +11,7 @@ import EducationModel from '../models/EducationModel';
 
 import multer = require('multer');
 
-const upload = multer({ dest: '../upload/resumes/' });
+const upload = multer({ dest: './uploads/resumes/' });
 
 export const checkLoginType: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const type = req.data.type;
