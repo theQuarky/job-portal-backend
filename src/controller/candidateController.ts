@@ -11,6 +11,14 @@ export const sendCandidate: express.RequestHandler = (req:IRequest, res:IRespons
     });
 }
 
+export const deleteCandidate: express.RequestHandler = (req:IRequest, res:IResponse, next:express.NextFunction)=> {
+    console.log(req.candidate);
+    return res.send({
+        message: "candidate deleted successfully"
+    });
+}
+8
+
 export const sendLoginToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     res.send({
         data: req.candidate,

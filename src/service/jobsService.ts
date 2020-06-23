@@ -66,6 +66,7 @@ export const validateData: express.RequestHandler = async (req: IRequest, res: I
     }
     return next();
 }
+
 export const makeDataPacket: express.RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params: IJobs = _.merge(req.body, req.params);
     const dataPacket: IJobs = {
@@ -106,6 +107,7 @@ export const insertJobs: RequestHandler = async (req: IRequest, res: IResponse, 
         return res.send(Boom.boomify(err, { statusCode: 500 }));
     }
 }
+
 export const getJobById: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params = _.merge(req.body, req.params);
     if (_.isUndefined(params.id) || !_.isInteger(parseInt(params.id))) {
@@ -151,6 +153,7 @@ export const deleteJob: RequestHandler = async (req: IRequest, res: IResponse, n
         return res.send(Boom.boomify(err, { statusCode: 500 }));
     }
 }
+
 export const updateJob: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params = _.merge(req.body, req.params);
     const dataPacket: IJobs = req.data;
@@ -166,7 +169,20 @@ export const updateJob: RequestHandler = async (req: IRequest, res: IResponse, n
         return res.send(Boom.boomify(err, { statusCode: 500 }));
     }
 }
+
 export const getAllJobs: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    let fromLimit, toLimit;
+    console.log(params.fromLimit, params.toLimit);
+
+    if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
+        fromLimit = 0;
+        toLimit = 10;
+    } else {
+        fromLimit = params.fromLimit;
+        toLimit = params.toLimit
+    }
+
     try {
         const response: IJobs | any = await JobModel.findAll({
             where: {
@@ -174,11 +190,13 @@ export const getAllJobs: RequestHandler = async (req: IRequest, res: IResponse, 
                     [Op.not]: 1
                 },
             },
+            offset: parseInt(fromLimit),
+            limit: parseInt(toLimit),
             include: [
                 {
                     as: 'employer',
                     model: EmployerModel,
-                    attributes: ['id', 'fullName', 'userName', 'phoneNumber','avatar']
+                    attributes: ['id', 'fullName', 'userName', 'phoneNumber', 'avatar']
                 }
             ]
         });

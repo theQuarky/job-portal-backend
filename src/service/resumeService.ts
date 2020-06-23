@@ -83,6 +83,7 @@ export const getAllResume: RequestHandler = async (req: IRequest, res: IResponse
         fromLimit = params.fromLimit;
         toLimit = params.toLimit
     }
+    
     try {
         const response = await ResumeModel.findAll({
             where: {
@@ -264,7 +265,6 @@ export const uploadResume: RequestHandler = async (req: IRequest, res: IResponse
         return res.send(Boom.boomify(err, { statusCode: 500 }));
     }
 }
-
 
 export const updateResumePath: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction)=>{
     const params = _.merge(req.body, req.params);

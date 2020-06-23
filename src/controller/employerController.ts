@@ -10,6 +10,13 @@ export const sendEmployer: express.RequestHandler = (req: IRequest, res: IRespon
     });
 }
 
+export const deleteEmployer: express.RequestHandler = (req:IRequest, res:IResponse, next:express.NextFunction)=> {
+    console.log(req.employer);
+    return res.send({
+        message: "employer deleted successfully"
+    });
+}
+
 export const sendLoginToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     res.send({
         data: req.employer,
