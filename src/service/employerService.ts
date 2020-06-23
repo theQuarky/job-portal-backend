@@ -47,13 +47,49 @@ export const validateData: express.RequestHandler = (req: IRequest, res: IRespon
     return next();
 }
 
+export const validateDataForUpdate: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const emailIdRegEx: RegExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    console.log("afsdf")
+    if (_.isEmpty(params.fullName)) {
+        const err = new Error("Enter Full Name");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    if (_.isEmpty(params.userName)) {
+        const err = new Error("Enter User Name");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    if (_.isEmpty(params.emailId) || !emailIdRegEx.test(params.emailId)) {
+        const err = new Error("Enter valid Email Id");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    if (_.isEmpty(params.phoneNumber.toString()) || !_.isInteger(parseInt(params.phoneNumber)) || (params.phoneNumber.toString().length !== 10)) {
+        const err = new Error("Enter Valid Phone Number");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    return next();
+}
+
+export const checkLoginType: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const type = req.data.type;
+    if (type !== "employer") {
+        const err = new Error("Please login as employer!!");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    return next();
+}
+
 export const findEmployerByEmail: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
                 emailId: params.emailId,
-                isDel:0
+                isDel: 0
             },
             attributes: ['id']
         });
@@ -76,7 +112,7 @@ export const findEmployerByUserName: express.RequestHandler = async (req: IReque
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
                 userName: params.userName,
-                isDel:0
+                isDel: 0
             },
             attributes: ['id']
         });
@@ -99,7 +135,7 @@ export const findEmployerByPhoneNumber: express.RequestHandler = async (req: IRe
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
                 phoneNumber: params.phoneNumber,
-                isDel:0
+                isDel: 0
             },
             attributes: ['id']
         });
@@ -176,11 +212,11 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
                         }
                     }
                 ],
-                isDel:0
+                isDel: 0
             },
-            attributes:["id","fullName","emailId","phoneNumber","userName"]
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName"]
         });
-        if(_.isEmpty(data)){
+        if (_.isEmpty(data)) {
             const err = new Error("Username and password is not matching!!");
             return res.send(Boom.boomify(err, { statusCode: 400 }));
         }
@@ -194,7 +230,139 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
 }
 
 export const generateToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
-    const employer = {employer: req.employer, type: 'employer'};
+    const employer = { employer: req.employer, type: 'employer' };
     req.token = jwt.sign(JSON.stringify(employer), CONFIG.JWT_ENCRYPTION);
     return next();
+}
+
+export const findEmployerByEmailForUpdate: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const id: number = req.data.employer.id;
+    try {
+        const data: IEmployer | any = await EmployerModel.findAll({
+            where: {
+                emailId: params.emailId,
+                isDel: 0,
+                id: {
+                    [Op.not]: id
+                }
+            },
+            attributes: ['id']
+        });
+        if (_.isEmpty(data) === false) {
+            const err = new Error("Email id is used!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        } else {
+            return next();
+        }
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const findEmployerByPhoneNumberForUpdate: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const id: number = req.data.employer.id;
+
+    try {
+        const data: IEmployer | any = await EmployerModel.findAll({
+            where: {
+                phoneNumber: params.phoneNumber,
+                isDel: 0,
+                id: {
+                    [Op.not]: id
+                }
+            },
+            attributes: ['id']
+        });
+
+        if (_.isEmpty(data) === false) {
+            const err = new Error("Phone number is used!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        } else {
+            return next();
+        }
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+
+}
+
+export const updateEmployer: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const id: number = req.data.employer.id;
+
+    const employerData: IEmployer = {
+        fullName: params.fullName,
+        userName: params.userName,
+        phoneNumber: params.phoneNumber,
+        emailId: params.emailId
+    };
+
+    try {
+        const data = await EmployerModel.update(employerData, {
+            where: {
+                id: id,
+                isDel: 0
+            }
+        });
+        req.employer = data;
+        return next();
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
+    }
+
+}
+
+export const deleteEmployer: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const id: number = req.data.employer.id;
+
+    try {
+        const data = await EmployerModel.update({ isDel: 1 }, {
+            where: {
+                id: id
+            }
+        });
+        req.employer = data;
+        return next();
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
+    }
+
+}
+
+export const getAllEmployer: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    let fromLimit, toLimit;
+    console.log(params.fromLimit, params.toLimit);
+
+    if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
+        fromLimit = 0;
+        toLimit = 10;
+    } else {
+        fromLimit = params.fromLimit;
+        toLimit = params.toLimit
+    }
+    try {
+        const data: IEmployer[] | any = await EmployerModel.findAll({
+            where: {
+                isDel: 0
+            },
+            offset: parseInt(fromLimit),
+            limit: parseInt(toLimit)
+        });
+        req.employer = data;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
 }
