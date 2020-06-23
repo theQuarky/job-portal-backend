@@ -4,6 +4,7 @@ import IResponse from '../interface/IResponse';
 import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
+import * as fs from 'fs';
 import CONFIG from '../config/config';
 import { ICandidate } from '../interface/ICandidate';
 import Boom = require('boom');
@@ -392,6 +393,65 @@ export const getAllCandidate: express.RequestHandler = async (req: IRequest, res
     } catch (error) {
         console.log(error);
         const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const uploadAvatar: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const file = req.file;   
+    
+    if (_.isUndefined(file)) {
+        const err = new Error("You must have to upload image!!");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    try {
+        const fileName = file.originalname;
+
+        const extensions = ['png', 'jpg', 'jpeg'];
+
+        const fileNameArray = fileName.split("");
+        let fileNameLength = fileNameArray.length;
+        let charFlag = fileNameArray[fileNameLength];
+        let fileExtenstion: any = [];
+
+        while (charFlag !== ".") {
+            fileNameLength = fileNameLength - 1;
+            charFlag = fileNameArray[fileNameLength];
+            fileExtenstion.push(charFlag);
+        }
+        fileExtenstion.pop();
+        fileExtenstion = fileExtenstion.reverse().join("").toLowerCase();
+
+        if (extensions.includes(fileExtenstion) === false) {
+            const err = new Error("Invalid file");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        }
+        const tempName = Date.now() + fileName;
+        const fileDdestination = './uploads/avatars/' + tempName;
+
+        fs.writeFileSync(fileDdestination, file.buffer.toString('base64'), { encoding: 'base64' });
+        req.candidate = {avatar : '/static/avatars/' + tempName};
+
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const updateAvatarPath: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const id: number = req.data.candidate.id;
+    try {
+        const response = await CandidateModel.update({ avatar: req.candidate.avatar }, {
+            where: {
+                id: id
+            }
+        });
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error");
         return res.send(Boom.boomify(err, { statusCode: 500 }));
     }
 }

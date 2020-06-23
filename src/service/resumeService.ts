@@ -267,12 +267,12 @@ export const uploadResume: RequestHandler = async (req: IRequest, res: IResponse
 }
 
 export const updateResumePath: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction)=>{
-    const params = _.merge(req.body, req.params);
+    const id: number = req.data.candidate.id;
 
     try {
         const response = await ResumeModel.update({resumePath: req.resumes.resumePath}, {
             where: {
-                id: params.id
+                id: id
             }
         });
         console.log(response);

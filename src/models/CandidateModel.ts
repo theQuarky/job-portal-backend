@@ -27,6 +27,10 @@ CandidateModel.init({
     password: {
         type: STRING
     },
+    avatar:{
+        type: STRING,
+        allowNull: true
+    },
     isDel: {
         type: INTEGER,
         defaultValue: 0

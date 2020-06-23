@@ -25,3 +25,9 @@ export const sendLoginToken: express.RequestHandler = (req: IRequest, res: IResp
         token: req.token
     });
 }
+
+export const avatarPath: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) =>{
+    return res.json({
+        msg: req.candidate.avatar
+    });
+}

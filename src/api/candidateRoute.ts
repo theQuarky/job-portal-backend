@@ -2,7 +2,9 @@ import { Router, NextFunction } from 'express';
 import * as candidateController from '../controller/candidateController';
 import * as candidateService from '../service/candidateService';
 import authentication from '../helpers/verifyToken';
+import multer = require('multer');
 
+const upload = multer();
 const candidate: Router = Router();
 
 candidate.post('/register', [
@@ -12,6 +14,19 @@ candidate.post('/register', [
     candidateService.findCandidateByPhoneNumber,
     candidateService.addCandidate,
     candidateController.sendCandidate
+]);
+
+candidate.post('/login', [
+    candidateService.validLoginCredentials,
+    candidateService.generateToken,
+    candidateController.sendLoginToken
+]);
+
+candidate.put('/avatar', authentication,upload.single('avatar'),[
+    candidateService.checkLoginType,
+    candidateService.uploadAvatar,
+    candidateService.updateAvatarPath,
+    candidateController.avatarPath
 ]);
 
 candidate.get('/',[
@@ -32,12 +47,6 @@ candidate.delete('/',authentication,[
     candidateService.checkLoginType,
     candidateService.deleteCandidate,
     candidateController.deleteCandidate
-]);
-
-candidate.post('/login', [
-    candidateService.validLoginCredentials,
-    candidateService.generateToken,
-    candidateController.sendLoginToken
 ]);
 
 export default candidate;
