@@ -5,6 +5,8 @@ import { IJobs } from './IJobs';
 import { IResume } from './IResume';
 import { IEducation } from './IEducation';
 import { IExperience } from './IExperience';
+import { IBlog } from "./IBlog";
+import { IVlog } from "./IVlog";
 
 export default interface IRequest extends express.Request {
     data?: any;
@@ -15,4 +17,6 @@ export default interface IRequest extends express.Request {
     resumes?: IResume[] | IResume | any;
     educations?: IEducation[] | IEducation | any;
     experience?: IExperience[] | IExperience |any;
+    blogs?: IBlog[] | IBlog | any;
+    vlogs?: IVlog[] | IVlog | any;
 }
