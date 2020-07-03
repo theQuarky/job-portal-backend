@@ -5,6 +5,7 @@ import jobs from './jobsRoute';
 import resume from './resumeRoute';
 import blog from './blogRoute';
 import vlog from './vlogRoute';
+import admin from './adminRoute';
 
 const router: Router = Router();
 
@@ -20,5 +21,5 @@ router.use('/jobs', jobs);
 router.use('/resume',resume);
 router.use('/blog', blog);
 router.use('/vlog', vlog);
-
+router.use('/admin', admin);
 export default router;
