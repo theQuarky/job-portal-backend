@@ -15,11 +15,15 @@ export default function authentication(req:IRequest, res:IResponse, next:NextFun
       // Get token from array
       const bearerToken = bearer[1];
       // Set the token
-      const decode = jwt.verify(bearerToken,CONFIG.JWT_ENCRYPTION);
+      // const decode
+      jwt.verify(bearerToken,CONFIG.JWT_ENCRYPTION,(err,decode)=>{
+        if(err)
+          return res.status(400).json({message:"don't mess with token!!"});
+        req.data = decode;
+        console.log(decode);
+        return next();
+      });
       // will send invalid jwt automatically else continue code further
-      req.data = decode;
-      console.log(decode);
-      return next();
   } else {
       // Forbidden
       const err = new Error("Please login");

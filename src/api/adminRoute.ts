@@ -15,7 +15,7 @@ admin.post('/login', (req, res, next) => {
     const params = _.merge(req.body, req.params);
 
     if (params.email === 'ranahiren27@gmail.com' && params.password === 'hiren@27') {
-        jwt.sign({ email: params.email, password: params.password }, CONFIG.JWT_ENCRYPTION, (err: any, token: any) => {
+        jwt.sign({ email: params.email, password: params.password,type:"admin" }, CONFIG.JWT_ENCRYPTION, (err: any, token: any) => {
             console.log(token);
             res.json({
                 token:token
@@ -29,14 +29,8 @@ admin.post('/login', (req, res, next) => {
 });
 
 admin.get('/test', authentication, (req: IRequest, res: IResponse, next: NextFunction) => {
-    jwt.verify(req.token, CONFIG.JWT_ENCRYPTION, (err, authData) => {
-        if (err) {
-            res.sendStatus(403);
-        } else {
-            res.json({
-                authData
-            });
-        }
+    res.json({
+        data: req.data
     });
 });
 

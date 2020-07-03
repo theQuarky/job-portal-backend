@@ -37,3 +37,5 @@ BlogModel.init({
     modelName: 'blog',
     tableName: 'blog'
 });
+
+export default BlogModel;
