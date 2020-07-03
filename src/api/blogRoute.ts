@@ -8,12 +8,12 @@ import CONFIG from '../config/config';
 
 const blog: Router = Router();
 
-blog.post('/')
+// blog.post('/')
 
-blog.get('/')
+// blog.get('/')
 
-blog.put('/')
+// blog.put('/')
 
-blog.delete('/')
+// blog.delete('/')
 
 export default blog;

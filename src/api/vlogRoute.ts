@@ -8,12 +8,12 @@ import CONFIG from '../config/config';
 
 const vlog: Router = Router();
 
-vlog.post('/')
+// vlog.post('/')
 
-vlog.get('/')
+// vlog.get('/')
 
-vlog.put('/')
+// vlog.put('/')
 
-vlog.delete('/')
+// vlog.delete('/')
 
 export default vlog;
