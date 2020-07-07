@@ -18,9 +18,15 @@ VlogModel.init({
     imgPath: {
         type: STRING,
         allowNull: false
+    },
+    isDel:{
+        type:INTEGER,
+        defaultValue: 0
     }
 }, {
     sequelize,
     modelName: 'vlogs',
     tableName: 'vlogs'
-})
+});
+
+export default VlogModel;

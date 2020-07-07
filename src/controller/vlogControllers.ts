@@ -8,27 +8,27 @@ export const tempController: RequestHandler = (req: IRequest, res: IResponse, ne
     });
 }
 
-export const blogById: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
+export const vlogById: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
     return res.json({
-        Blog: req.blogs
+        Vlog: req.vlogs
     });
 }
 
-export const allBlogs: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
+export const allVlogs: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
     console.log(req.blogs);
     return res.json({
-        Blog: req.blogs
+        Vlog: req.vlogs
     });
 }
 
-export const updateBlogs: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
+export const updateVlogs: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
     return res.json({
         message: req.data
     });
 }
 
-export const deleteBlog: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
+export const deleteVlog: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
     return res.json({
-        message: `Blog with id ${req.params.id} is deleted!!`
+        message: `Vlog with id ${req.params.id} is deleted!!`
     });
 }

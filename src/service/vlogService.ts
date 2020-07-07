@@ -1,34 +1,13 @@
-import { IBlog } from './../interface/IBlog';
-import * as express from 'express';
+import * as express from "express";
 import IRequest from '../interface/IRequest';
 import IResponse from '../interface/IResponse';
-import * as crypto from 'crypto';
-import * as jwt from 'jsonwebtoken';
-import BlogModel from "../models/BlogModel";
-import Boom = require('boom');
-import * as _ from 'lodash';
+import { NextFunction, RequestHandler } from 'express';
+import Boom = require("boom");
+import _ = require("lodash");
 import * as fs from 'fs';
-import CONFIG from '../config/config';
-
-export const validateData: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
-    const params = _.merge(req.body, req.params);
-    if (_.isEmpty(params.title)) {
-        const err = new Error("Title is require");
-        return res.send(Boom.boomify(err, { statusCode: 400 }));
-    }
-
-    if (_.isEmpty(params.shortDescription)) {
-        const err = new Error("Sort Description is require");
-        return res.send(Boom.boomify(err, { statusCode: 400 }));
-    }
-
-    if (_.isEmpty(params.description)) {
-        const err = new Error("Description is require");
-        return res.send(Boom.boomify(err, { statusCode: 400 }));
-    }
-
-    return next();
-}
+import { Op } from "sequelize";
+import { IVlog } from '../interface/IVlog';
+import VlogModel from '../models/VlogModel';
 
 export const checkLoginType: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const type = req.data.type;
@@ -39,11 +18,21 @@ export const checkLoginType: express.RequestHandler = async (req: IRequest, res:
     return next();
 }
 
-export const uploadBlogImg: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const validateData: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.body, req.params);
+    if (_.isEmpty(params.title)) {
+        const err = new Error("Title is require");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    return next();
+}
+
+export const uploadVlog: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const file = req.file;
     const params = _.merge(req.body, req.params);
     if (_.isUndefined(file)) {
-        const err = new Error("You must have to upload blog image!!");
+        const err = new Error("You must have to upload vlog video!!");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
     req.blogs = {
@@ -54,7 +43,21 @@ export const uploadBlogImg: express.RequestHandler = async (req: IRequest, res: 
 
     const fileName = file.originalname;
 
-    const extensions = ['jpg', 'jpeg', 'png'];
+    const extensions = [
+        "mp4",
+        "m4a",
+        "m4v",
+        "f4v",
+        "f4a",
+        "m4b",
+        "m4r",
+        "f4b",
+        "mov",
+        "wmv",
+        "wma",
+        "webm",
+        "flv"
+    ];
 
     const fileNameArray = fileName.split("");
     let fileNameLength = fileNameArray.length;
@@ -74,12 +77,12 @@ export const uploadBlogImg: express.RequestHandler = async (req: IRequest, res: 
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
     const tempName = Date.now() + fileName;
-    const fileDdestination = './uploads/blogs/' + tempName;
+    const fileDdestination = './uploads/vlogs/' + tempName;
 
     try {
         fs.writeFileSync(fileDdestination, file.buffer.toString('base64'), { encoding: 'base64' });
         console.log('/static/blogs/' + tempName);
-        req.blogs.imgPath = '/static/blogs/' + tempName;
+        req.vlogs.imgPath = '/static/vlogs/' + tempName;
         return next();
     } catch (error) {
         console.log(error);
@@ -88,18 +91,16 @@ export const uploadBlogImg: express.RequestHandler = async (req: IRequest, res: 
     }
 }
 
-export const insertBlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const insertVlog: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params = _.merge(req.body, req.params);
-    const packege: IBlog = {
+    const packege: IVlog = {
         title: params.title,
-        shortDescription: params.shortDescription,
-        description: params.description,
-        imgPath: req.blogs.imgPath
+        imgPath: req.vlogs.imgPath
     };
     try {
-        const data = await BlogModel.create(packege, { raw: true });
+        const data = await VlogModel.create(packege, { raw: true });
         console.log(data);
-        req.blogs = data;
+        req.vlogs = data;
         return next();
     } catch (error) {
         console.log(error);
@@ -108,7 +109,7 @@ export const insertBlog: express.RequestHandler = async (req: IRequest, res: IRe
     }
 }
 
-export const getAllBlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const getAllVlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params = _.merge(req.params, req.body, req.query);
     let fromLimit, toLimit;
     console.log(params.fromLimit, params.toLimit);
@@ -121,7 +122,7 @@ export const getAllBlog: express.RequestHandler = async (req: IRequest, res: IRe
         toLimit = params.toLimit
     }
     try {
-        const data: IBlog[] | any = await BlogModel.findAll({
+        const data: IVlog[] | any = await VlogModel.findAll({
             where: {
                 isDel: 0
             },
@@ -137,19 +138,19 @@ export const getAllBlog: express.RequestHandler = async (req: IRequest, res: IRe
     }
 }
 
-export const findBlogById: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const findVlogById: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params = _.merge(req.body, req.params);
     if (_.isEmpty(params.id)) {
-        const err = new Error("Id of blog is require");
+        const err = new Error("Id of vlog is require");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
     }
     try {
-        const data = await BlogModel.findOne({ where: { id: params.id, isDel: 0 } });
+        const data = await VlogModel.findOne({ where: { id: params.id, isDel: 0 } });
         if (_.isEmpty(data)) {
-            const error = new Error(`Blog with id ${params.id} is not found!!`);
+            const error = new Error(`Vlog with id ${params.id} is not found!!`);
             return res.send(Boom.boomify(error, { statusCode: 400 }));
         }
-        req.blogs = data;
+        req.vlogs = data;
         return next();
     } catch (error) {
         console.log(error);
@@ -158,16 +159,14 @@ export const findBlogById: express.RequestHandler = async (req: IRequest, res: I
     }
 }
 
-export const updateBlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const updateVlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params = _.merge(req.body, req.params);
 
-    const packege: IBlog = {
-        title: params.title,
-        shortDescription: params.shortDescription,
-        description: params.description
+    const packege: IVlog = {
+        title: params.title
     };
     try {
-        const data = await BlogModel.update(packege, {
+        const data = await VlogModel.update(packege, {
             where: {
                 id: params.id
             }
@@ -186,7 +185,7 @@ export const updateImgPath: express.RequestHandler = async (req: IRequest, res: 
     const params = _.merge(req.body, req.params);
 
     try {
-        const data = await BlogModel.update({ imgPath: req.blogs.imgPath }, {
+        const data = await VlogModel.update({ imgPath: req.vlogs.imgPath }, {
             where: {
                 id: params.id
             }
@@ -201,11 +200,11 @@ export const updateImgPath: express.RequestHandler = async (req: IRequest, res: 
     }
 }
 
-export const deletBlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+export const deletVlog: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params = _.merge(req.body, req.params);
 
     try {
-        const data = await BlogModel.update({ isDel: 1 }, {
+        const data = await VlogModel.update({ isDel: 1 }, {
             where: {
                 id: params.id
             }

@@ -23,7 +23,12 @@ blog.post('/',authentication,upload.single('blogImg'),[
 blog.get('/',[
     blogService.getAllBlog,
     blogController.allBlogs
-])
+]);
+
+blog.get('/:id',[
+    blogService.findBlogById,
+    blogController.allBlogs
+]);
 
 blog.put('/:id',authentication,[
     blogService.checkLoginType,
@@ -35,8 +40,8 @@ blog.put('/:id',authentication,[
 
 blog.put('/upload/:id',authentication,upload.single('blogImg'),[
     blogService.checkLoginType,
-    blogService.uploadBlogImg,
     blogService.findBlogById,
+    blogService.uploadBlogImg,
     blogService.updateImgPath,
     blogController.updateBlogs
 ]);
@@ -45,6 +50,6 @@ blog.delete('/:id',authentication,[
     blogService.findBlogById,
     blogService.deletBlog,
     blogController.deleteBlog
-])
+]);
 
 export default blog;
