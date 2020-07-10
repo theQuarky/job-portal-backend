@@ -24,6 +24,12 @@ jobs.get('/',[
     jobController.allJobs
 ]);
 
+jobs.get('/myjobs',authentication,[
+    jobServices.checkLoginType,
+    jobServices.myJobs,
+    jobController.allJobs
+]);
+
 jobs.get('/:id',[
     jobServices.getJobById,
     jobController.jobById

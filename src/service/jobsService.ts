@@ -177,7 +177,7 @@ export const getAllJobs: RequestHandler = async (req: IRequest, res: IResponse, 
 
     if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
         fromLimit = 0;
-        toLimit = 10;
+        toLimit = 5;
     } else {
         fromLimit = params.fromLimit;
         toLimit = params.toLimit
@@ -195,8 +195,46 @@ export const getAllJobs: RequestHandler = async (req: IRequest, res: IResponse, 
             include: [
                 {
                     as: 'employer',
-                    model: EmployerModel,
-                    attributes: ['id', 'fullName', 'userName', 'phoneNumber', 'avatar']
+                    model: EmployerModel
+                }
+            ]
+        });
+        req.jobs = response;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error!!");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const myJobs: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+    let fromLimit, toLimit;
+    console.log(params.fromLimit, params.toLimit);
+    const id = req.data.employer.id;
+    if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
+        fromLimit = 0;
+        toLimit = 5;
+    } else {
+        fromLimit = params.fromLimit;
+        toLimit = params.toLimit
+    }
+
+    try {
+        const response: IJobs | any = await JobModel.findAll({
+            where: {
+                isDel: {
+                    [Op.not]: 1
+                },
+                addedBy: id
+            },
+            offset: parseInt(fromLimit),
+            limit: parseInt(toLimit),
+            include: [
+                {
+                    as: 'employer',
+                    model: EmployerModel
                 }
             ]
         });
