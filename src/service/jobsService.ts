@@ -231,14 +231,40 @@ export const myJobs: RequestHandler = async (req: IRequest, res: IResponse, next
             },
             offset: parseInt(fromLimit),
             limit: parseInt(toLimit),
-            include: [
-                {
-                    as: 'employer',
-                    model: EmployerModel
-                }
-            ]
+            raw: true
         });
         req.jobs = response;
+        const len = await JobModel.findAll({
+            where: {
+                isDel: {
+                    [Op.not]: 1
+                },
+                addedBy: id
+            },
+            raw: true
+        });
+        req.data = len.length;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("Server side error!!");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const countMyJobs: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
+    const id = req.data.employer.id;
+    try {
+        const len = await JobModel.findAll({
+            where: {
+                isDel: {
+                    [Op.not]: 1
+                },
+                addedBy: id
+            },
+            raw: true
+        });
+        req.data = len.length;
         return next();
     } catch (error) {
         console.log(error);

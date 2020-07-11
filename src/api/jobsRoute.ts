@@ -30,6 +30,12 @@ jobs.get('/myjobs',authentication,[
     jobController.allJobs
 ]);
 
+jobs.get('/myjobscount',authentication,[
+    jobServices.checkLoginType,
+    jobServices.countMyJobs,
+    jobController.myJobLength
+]);
+
 jobs.get('/:id',[
     jobServices.getJobById,
     jobController.jobById

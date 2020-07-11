@@ -19,6 +19,11 @@ export const allJobs: RequestHandler = (req: IRequest, res: IResponse, next: Nex
         job: req.jobs
     });
 }
+export const myJobLength: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
+    return res.json({
+        total: req.data
+    });
+}
 
 export const updateJobs: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
     return res.json({
