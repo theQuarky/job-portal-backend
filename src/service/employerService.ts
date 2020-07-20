@@ -436,6 +436,30 @@ export const getAllEmployer: express.RequestHandler = async (req: IRequest, res:
     }
 }
 
+export const getEmployerById: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+
+    try {
+        const data: IEmployer[] | any = await EmployerModel.findAll({
+            where: {
+                isDel: 0,
+                id: params.id
+            },
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName", "avatar", "aboutUs"]
+        });
+        if (_.isEmpty(data)) {
+            const err = new Error(`Employer with id ${params.id} is not exist`);
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        }
+        req.employer = data;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
 export const uploadAvatar: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const file = req.file;
 

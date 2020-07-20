@@ -34,6 +34,11 @@ employer.get('/',[
     employerController.sendEmployer
 ]);
 
+employer.get('/:id',[
+    employerService.getEmployerById,
+    employerController.sendEmployer
+]);
+
 employer.put('/:id', authentication,[
     employerService.checkLoginType,
     employerService.confirmId,
@@ -44,9 +49,12 @@ employer.put('/:id', authentication,[
     employerController.sendEmployer
 ]);
 
+employer.put('/changePassword/:id',authentication,[
+
+]);
+
 employer.delete('/:id',authentication,[
     employerService.checkLoginType,
-    employerService.confirmId,
     employerService.deleteEmployer,
     employerController.deleteEmployer
 ]);
