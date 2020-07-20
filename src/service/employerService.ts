@@ -51,7 +51,7 @@ export const validateData: express.RequestHandler = (req: IRequest, res: IRespon
 export const validateDataForUpdate: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
     const emailIdRegEx: RegExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    console.log("afsdf")
+
     if (_.isEmpty(params.fullName)) {
         const err = new Error("Enter Full Name");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
@@ -215,8 +215,7 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
                 ],
                 isDel: 0
             },
-            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName","avatar"]
-
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName", "avatar", "aboutUs"]
         });
         if (_.isEmpty(data)) {
             const err = new Error("Username and password is not matching!!");
@@ -239,14 +238,13 @@ export const generateToken: express.RequestHandler = (req: IRequest, res: IRespo
 
 export const findEmployerByEmailForUpdate: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-    const id: number = req.data.employer.id;
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
             where: {
                 emailId: params.emailId,
                 isDel: 0,
                 id: {
-                    [Op.not]: id
+                    [Op.not]: params.id
                 }
             },
             attributes: ['id']
@@ -266,7 +264,6 @@ export const findEmployerByEmailForUpdate: express.RequestHandler = async (req: 
 
 export const findEmployerByPhoneNumberForUpdate: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-    const id: number = req.data.employer.id;
 
     try {
         const data: IEmployer | any = await EmployerModel.findAll({
@@ -274,7 +271,7 @@ export const findEmployerByPhoneNumberForUpdate: express.RequestHandler = async 
                 phoneNumber: params.phoneNumber,
                 isDel: 0,
                 id: {
-                    [Op.not]: id
+                    [Op.not]: params.id
                 }
             },
             attributes: ['id']
@@ -296,19 +293,19 @@ export const findEmployerByPhoneNumberForUpdate: express.RequestHandler = async 
 
 export const updateEmployer: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-    const id: number = req.data.employer.id;
 
     const employerData: IEmployer = {
         fullName: params.fullName,
         userName: params.userName,
         phoneNumber: params.phoneNumber,
-        emailId: params.emailId
+        emailId: params.emailId,
+        aboutUs: params.aboutUs
     };
 
     try {
         const data = await EmployerModel.update(employerData, {
             where: {
-                id: id,
+                id: params.id,
                 isDel: 0
             }
         });
@@ -323,12 +320,11 @@ export const updateEmployer: express.RequestHandler = async (req: IRequest, res:
 
 export const deleteEmployer: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-    const id: number = req.data.employer.id;
 
     try {
         const data = await EmployerModel.update({ isDel: 1 }, {
             where: {
-                id: id
+                id: params.id
             }
         });
         req.employer = data;
@@ -338,6 +334,76 @@ export const deleteEmployer: express.RequestHandler = async (req: IRequest, res:
         return res.send(Boom.boomify(error, { statusCode: 500 }));
     }
 
+}
+
+export const confirmId: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+
+    if (params.id.toString() !== req.data.employer.id.toString()) {
+        const err = new Error("Invalid request");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    return next();
+}
+
+export const checkPassword: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+
+    if (_.isEmpty(params.oldPassword)) {
+        const err = new Error("Old Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+
+    }
+    if (_.isEmpty(params.newPassword)) {
+        const err = new Error("New Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+
+    }
+    if (_.isEmpty(params.reNewPassword)) {
+        const err = new Error("ReType New Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    if (params.newPassword.toString().trim() !== params.reNewPassword.toString().trim()) {
+        const err = new Error("ReType New Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    const oldPassword = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.oldPassword.trim()).digest('hex');
+    try {
+        const response = EmployerModel.findAll({
+            where: {
+                id: params.id,
+                password: oldPassword
+            }
+        });
+        if (_.isEmpty(response) === false) {
+            const err = new Error("Entered wrong password!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        } else {
+            return next();
+        }
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
+    }
+}
+
+export const changePassword: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const password = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.newPassword.trim()).digest('hex');
+    try {
+        const response = EmployerModel.update({
+            password
+        }, {
+            where: {
+                id: params.id
+            }
+        });
+        return next();
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
+    }
 }
 
 export const getAllEmployer: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
@@ -358,7 +424,8 @@ export const getAllEmployer: express.RequestHandler = async (req: IRequest, res:
                 isDel: 0
             },
             offset: parseInt(fromLimit),
-            limit: parseInt(toLimit)
+            limit: parseInt(toLimit),
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName", "avatar", "aboutUs"]
         });
         req.employer = data;
         return next();
@@ -370,8 +437,8 @@ export const getAllEmployer: express.RequestHandler = async (req: IRequest, res:
 }
 
 export const uploadAvatar: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
-    const file = req.file;   
-    
+    const file = req.file;
+
     if (_.isUndefined(file)) {
         const err = new Error("You must have to upload image!!");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
@@ -402,7 +469,7 @@ export const uploadAvatar: express.RequestHandler = async (req: IRequest, res: I
         const fileDdestination = './uploads/avatars/' + tempName;
 
         fs.writeFileSync(fileDdestination, file.buffer.toString('base64'), { encoding: 'base64' });
-        req.employer = {avatar : '/static/avatars/' + tempName};
+        req.employer = { avatar: '/static/avatars/' + tempName };
 
         return next();
     } catch (error) {

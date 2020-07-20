@@ -30,6 +30,10 @@ EmployerModel.init({
         type: STRING,
         allowNull: true
     },
+    aboutUs:{
+        type:STRING,
+        allowNull: true
+    },
     isDel: {
         type: INTEGER,
         defaultValue: 0

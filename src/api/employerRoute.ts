@@ -34,8 +34,9 @@ employer.get('/',[
     employerController.sendEmployer
 ]);
 
-employer.put('/', authentication,[
+employer.put('/:id', authentication,[
     employerService.checkLoginType,
+    employerService.confirmId,
     employerService.validateDataForUpdate,
     employerService.findEmployerByEmailForUpdate,
     employerService.findEmployerByPhoneNumberForUpdate,
@@ -43,8 +44,9 @@ employer.put('/', authentication,[
     employerController.sendEmployer
 ]);
 
-employer.delete('/',authentication,[
+employer.delete('/:id',authentication,[
     employerService.checkLoginType,
+    employerService.confirmId,
     employerService.deleteEmployer,
     employerController.deleteEmployer
 ]);

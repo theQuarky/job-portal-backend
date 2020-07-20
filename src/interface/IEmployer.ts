@@ -4,5 +4,7 @@ export interface IEmployer {
     userName?: string,
     phoneNumber?: number,
     emailId?: string,
-    password?: string
+    password?: string,
+    avatar?:string,
+    aboutUs?:string
 }
