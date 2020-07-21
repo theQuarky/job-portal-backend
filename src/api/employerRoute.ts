@@ -48,7 +48,7 @@ employer.put('/:id', authentication,[
     employerService.updateEmployer,
     employerService.getEmployerById,
     employerService.generateToken,
-    employerController.sendEmployer
+    employerController.sendLoginToken
 ]);
 
 employer.put('/changePassword/:id',authentication,[
