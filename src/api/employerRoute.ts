@@ -46,6 +46,8 @@ employer.put('/:id', authentication,[
     employerService.findEmployerByEmailForUpdate,
     employerService.findEmployerByPhoneNumberForUpdate,
     employerService.updateEmployer,
+    employerService.getEmployerById,
+    employerService.generateToken,
     employerController.sendEmployer
 ]);
 
