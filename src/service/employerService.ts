@@ -462,7 +462,7 @@ export const getEmployerById: express.RequestHandler = async (req: IRequest, res
 
 export const uploadAvatar: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const file = req.file;
-
+    console.log('coming here!!');
     if (_.isUndefined(file)) {
         const err = new Error("You must have to upload image!!");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
