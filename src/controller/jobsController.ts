@@ -27,7 +27,8 @@ export const myJobLength: RequestHandler = (req: IRequest, res: IResponse, next:
 
 export const updateJobs: RequestHandler = (req: IRequest, res: IResponse, next: NextFunction) =>{
     return res.json({
-        message: req.data
+        message: req.data,
+        token: req.token
     });
 }
 

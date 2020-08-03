@@ -27,6 +27,10 @@ CandidateModel.init({
     password: {
         type: sequelize_1.STRING
     },
+    avatar: {
+        type: sequelize_1.STRING,
+        allowNull: true
+    },
     isDel: {
         type: sequelize_1.INTEGER,
         defaultValue: 0

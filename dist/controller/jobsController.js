@@ -15,6 +15,11 @@ exports.allJobs = (req, res, next) => {
         job: req.jobs
     });
 };
+exports.myJobLength = (req, res, next) => {
+    return res.json({
+        total: req.data
+    });
+};
 exports.updateJobs = (req, res, next) => {
     return res.json({
         message: req.data

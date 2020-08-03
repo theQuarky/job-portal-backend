@@ -173,6 +173,17 @@ exports.updateJob = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getAllJobs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const params = _.merge(req.params, req.body, req.query);
+    let fromLimit, toLimit;
+    console.log(params.fromLimit, params.toLimit);
+    if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
+        fromLimit = 0;
+        toLimit = 5;
+    }
+    else {
+        fromLimit = params.fromLimit;
+        toLimit = params.toLimit;
+    }
     try {
         const response = yield JobModel_1.default.findAll({
             where: {
@@ -180,15 +191,81 @@ exports.getAllJobs = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
                     [sequelize_1.Op.not]: 1
                 },
             },
+            offset: parseInt(fromLimit),
+            limit: parseInt(toLimit),
             include: [
                 {
                     as: 'employer',
-                    model: EmployerModel_1.default,
-                    attributes: ['id', 'fullName', 'userName', 'phoneNumber', 'avatar']
+                    model: EmployerModel_1.default
                 }
             ]
         });
         req.jobs = response;
+        return next();
+    }
+    catch (error) {
+        console.log(error);
+        const err = new Error("Server side error!!");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+});
+exports.myJobs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const params = _.merge(req.params, req.body, req.query);
+    let fromLimit, toLimit;
+    console.log(params.fromLimit, params.toLimit);
+    const id = req.data.employer.id;
+    if (_.isUndefined(params.fromLimit) || _.isUndefined(params.fromLimit) || !_.isInteger(parseInt(params.fromLimit)) || !_.isInteger(parseInt(params.toLimit))) {
+        fromLimit = 0;
+        toLimit = 5;
+    }
+    else {
+        fromLimit = params.fromLimit;
+        toLimit = params.toLimit;
+    }
+    try {
+        const response = yield JobModel_1.default.findAll({
+            where: {
+                isDel: {
+                    [sequelize_1.Op.not]: 1
+                },
+                addedBy: id
+            },
+            offset: parseInt(fromLimit),
+            limit: parseInt(toLimit),
+            raw: true
+        });
+        req.jobs = response;
+        const len = yield JobModel_1.default.findAll({
+            where: {
+                isDel: {
+                    [sequelize_1.Op.not]: 1
+                },
+                addedBy: id
+            },
+            raw: true
+        });
+        req.data = len.length;
+        return next();
+    }
+    catch (error) {
+        console.log(error);
+        const err = new Error("Server side error!!");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+});
+exports.countMyJobs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.data.employer.id;
+    try {
+        const len = yield JobModel_1.default.findAll({
+            where: {
+                isDel: {
+                    [sequelize_1.Op.not]: 1
+                },
+                addedBy: id
+            },
+            raw: true
+        });
+        req.data = len.length;
         return next();
     }
     catch (error) {

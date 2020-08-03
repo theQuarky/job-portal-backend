@@ -220,7 +220,7 @@ export const myJobs: RequestHandler = async (req: IRequest, res: IResponse, next
         fromLimit = params.fromLimit;
         toLimit = params.toLimit
     }
-
+    console.log(req.data);
     try {
         const response: IJobs | any = await JobModel.findAll({
             where: {
@@ -254,6 +254,7 @@ export const myJobs: RequestHandler = async (req: IRequest, res: IResponse, next
 
 export const countMyJobs: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const id = req.data.employer.id;
+    console.log(id);
     try {
         const len = await JobModel.findAll({
             where: {

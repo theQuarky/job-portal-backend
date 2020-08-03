@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import * as jobController from '../controller/jobsController';
 import * as jobServices from '../service/jobsService';
+import * as employerServices from '../service/employerService';
 import authentication from '../helpers/verifyToken';
-import { jobById } from '../controller/jobsController';
 
 const jobs: Router = Router();
 

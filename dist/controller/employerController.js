@@ -6,10 +6,21 @@ exports.sendEmployer = (req, res, next) => {
         data: req.employer
     });
 };
+exports.deleteEmployer = (req, res, next) => {
+    console.log(req.employer);
+    return res.send({
+        message: "employer deleted successfully"
+    });
+};
 exports.sendLoginToken = (req, res, next) => {
     res.send({
         data: req.employer,
         token: req.token
+    });
+};
+exports.avatarPath = (req, res, next) => {
+    return res.json({
+        msg: req.employer.avatar
     });
 };
 //# sourceMappingURL=employerController.js.map

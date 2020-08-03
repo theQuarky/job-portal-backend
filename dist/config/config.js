@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = require("dotenv");
 dotenv.config();
-const DB_URLSTRING = process.env.DB_URL || "mysql://root:toor@localhost:3306/myoptjobs";
+const DB_URLSTRING = process.env.DB_URL || "mysql://hrana:" + encodeURIComponent('Hirenr@n@') + "@35.187.243.47:3306/myoptjobs";
 const CONFIG = {
     APP: process.env.APP || 'development',
     PORT: process.env.PORT || '8000',

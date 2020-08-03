@@ -20,6 +20,16 @@ jobs.get('/', [
     jobServices.getAllJobs,
     jobController.allJobs
 ]);
+jobs.get('/myjobs', verifyToken_1.default, [
+    jobServices.checkLoginType,
+    jobServices.myJobs,
+    jobController.allJobs
+]);
+jobs.get('/myjobscount', verifyToken_1.default, [
+    jobServices.checkLoginType,
+    jobServices.countMyJobs,
+    jobController.myJobLength
+]);
 jobs.get('/:id', [
     jobServices.getJobById,
     jobController.jobById

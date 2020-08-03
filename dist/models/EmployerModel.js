@@ -31,6 +31,10 @@ EmployerModel.init({
         type: sequelize_1.STRING,
         allowNull: true
     },
+    aboutUs: {
+        type: sequelize_1.STRING,
+        allowNull: true
+    },
     isDel: {
         type: sequelize_1.INTEGER,
         defaultValue: 0

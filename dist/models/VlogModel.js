@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../config/db");
 const sequelize_1 = require("sequelize");
 const sequelize_2 = require("sequelize");
-class BlogModel extends sequelize_2.Model {
+class VlogModel extends sequelize_2.Model {
 }
-BlogModel.init({
+VlogModel.init({
     id: {
         type: sequelize_1.INTEGER,
         allowNull: false,
@@ -16,15 +16,7 @@ BlogModel.init({
         type: sequelize_1.STRING,
         allowNull: false
     },
-    shortDescription: {
-        type: sequelize_1.STRING,
-        allowNull: true
-    },
     imgPath: {
-        type: sequelize_1.STRING,
-        allowNull: false
-    },
-    description: {
         type: sequelize_1.STRING,
         allowNull: false
     },
@@ -34,8 +26,8 @@ BlogModel.init({
     }
 }, {
     sequelize: db_1.default,
-    modelName: 'blog',
-    tableName: 'blog'
+    modelName: 'vlogs',
+    tableName: 'vlogs'
 });
-exports.default = BlogModel;
-//# sourceMappingURL=BlogModel.js.map
+exports.default = VlogModel;
+//# sourceMappingURL=VlogModel.js.map

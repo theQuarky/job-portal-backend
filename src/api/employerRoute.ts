@@ -52,7 +52,9 @@ employer.put('/:id', authentication,[
 ]);
 
 employer.put('/changePassword/:id',authentication,[
-
+    employerService.checkPassword,
+    employerService.changePassword,
+    employerController.changePassword
 ]);
 
 employer.delete('/:id',authentication,[

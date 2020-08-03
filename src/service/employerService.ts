@@ -232,6 +232,7 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
 
 export const generateToken: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const employer = { employer: req.employer, type: 'employer' };
+    console.log(employer);
     req.token = jwt.sign(JSON.stringify(employer), CONFIG.JWT_ENCRYPTION);
     return next();
 }
@@ -338,7 +339,7 @@ export const deleteEmployer: express.RequestHandler = async (req: IRequest, res:
 
 export const confirmId: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-
+    console.log(req.data);
     if (params.id.toString() !== req.data.employer.id.toString()) {
         const err = new Error("Invalid request");
         return res.send(Boom.boomify(err, { statusCode: 400 }));
@@ -451,7 +452,7 @@ export const getEmployerById: express.RequestHandler = async (req: IRequest, res
             const err = new Error(`Employer with id ${params.id} is not exist`);
             return res.send(Boom.boomify(err, { statusCode: 400 }));
         }
-        req.employer = data;
+        req.employer = data[0];
         return next();
     } catch (error) {
         console.log(error);
@@ -475,24 +476,24 @@ export const uploadAvatar: express.RequestHandler = async (req: IRequest, res: I
         const fileNameArray = fileName.split("");
         let fileNameLength = fileNameArray.length;
         let charFlag = fileNameArray[fileNameLength];
-        let fileExtenstion: any = [];
+        let fileExtensions: any = [];
 
         while (charFlag !== ".") {
             fileNameLength = fileNameLength - 1;
             charFlag = fileNameArray[fileNameLength];
-            fileExtenstion.push(charFlag);
+            fileExtensions.push(charFlag);
         }
-        fileExtenstion.pop();
-        fileExtenstion = fileExtenstion.reverse().join("").toLowerCase();
+        fileExtensions.pop();
+        fileExtensions = fileExtensions.reverse().join("").toLowerCase();
 
-        if (extensions.includes(fileExtenstion) === false) {
+        if (extensions.includes(fileExtensions) === false) {
             const err = new Error("Invalid file");
             return res.send(Boom.boomify(err, { statusCode: 400 }));
         }
         const tempName = Date.now() + fileName;
-        const fileDdestination = './uploads/avatars/' + tempName;
+        const fileDestination = './uploads/avatars/' + tempName;
 
-        fs.writeFileSync(fileDdestination, file.buffer.toString('base64'), { encoding: 'base64' });
+        fs.writeFileSync(fileDestination, file.buffer.toString('base64'), { encoding: 'base64' });
         req.employer = { avatar: '/static/avatars/' + tempName };
 
         return next();

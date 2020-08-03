@@ -16,7 +16,7 @@ const ResumeModel_1 = require("../models/ResumeModel");
 const ExperienceModel_1 = require("../models/ExperienceModel");
 const EducationModel_1 = require("../models/EducationModel");
 const multer = require("multer");
-const upload = multer({ dest: '../upload/resumes/' });
+const upload = multer({ dest: './uploads/resumes/' });
 exports.checkLoginType = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const type = req.data.type;
     if (type !== "candidate") {
@@ -247,11 +247,11 @@ exports.uploadResume = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.updateResumePath = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const params = _.merge(req.body, req.params);
+    const id = req.data.candidate.id;
     try {
         const response = yield ResumeModel_1.default.update({ resumePath: req.resumes.resumePath }, {
             where: {
-                id: params.id
+                id: id
             }
         });
         console.log(response);

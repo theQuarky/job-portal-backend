@@ -56,10 +56,8 @@ resume.delete('/:id', verifyToken_1.default, [
     resumeService.deleteResume,
     resumeController.deleteData
 ]);
-resume.put('/upload/:id', verifyToken_1.default, upload.single('resumeFile'), [
+resume.put('/uploadResume/', verifyToken_1.default, upload.single('resumeFile'), [
     resumeService.checkLoginType,
-    resumeService.getAllResumeById,
-    resumeService.validateCandidateIdForResume,
     resumeService.uploadResume,
     resumeService.updateResumePath,
     resumeController.resumePath
