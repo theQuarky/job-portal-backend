@@ -371,13 +371,13 @@ export const checkPassword: express.RequestHandler = async (req: IRequest, res: 
 
     const oldPassword = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.oldPassword.trim()).digest('hex');
     try {
-        const response = EmployerModel.findAll({
+        const response = await EmployerModel.findOne({
             where: {
                 id: params.id,
                 password: oldPassword
             }
         });
-        if (_.isEmpty(response) === false) {
+        if (_.isEmpty(response)) {
             const err = new Error("Entered wrong password!!");
             return res.send(Boom.boomify(err, { statusCode: 400 }));
         } else {
