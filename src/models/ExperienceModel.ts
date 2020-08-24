@@ -36,6 +36,11 @@ ExperienceModel.init({
     endYear: {
         type: INTEGER,
         allowNull: true
+    },
+    description: {
+        type: STRING,
+        allowNull: true,
+        defaultValue: ""
     }
 }, {
     sequelize,

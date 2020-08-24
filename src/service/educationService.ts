@@ -5,8 +5,6 @@ import EducationModel from '../models/EducationModel';
 import Boom = require("boom");
 import _ = require('lodash');
 import { IEducation } from '../interface/IEducation';
-import { any } from 'bluebird';
-import resume from '../api/resumeRoute';
 
 export const makeDataPacket: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
     const params = _.merge(req.body, req.params);
@@ -26,7 +24,8 @@ export const makeDataPacket: RequestHandler = async (req: IRequest, res: IRespon
             designation: education.designation,
             institute: education.institute,
             startYear: education.startYear || null,
-            endYear: education.endYear || null
+            endYear: education.endYear || null,
+            description: education.description || null
         };
         dataPacket.push(packet);
     });
@@ -55,7 +54,7 @@ export const insertData: RequestHandler = async (req: IRequest, res: IResponse, 
 }
 
 export const deleteData: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
-    const id = req.body.id;
+    const id = req.resumes.id;
 
     try {
         const response = await EducationModel.destroy({

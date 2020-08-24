@@ -5,6 +5,7 @@ export interface IResume {
     id?: number;
     fullName?: string;
     location?: string;
+    skills?:string;
     experienceYear?: number;
     aboutYou?: string;
     addedBy?:number;

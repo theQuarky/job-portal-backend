@@ -26,7 +26,8 @@ export const makeDataPacket: RequestHandler = async (req: IRequest, res: IRespon
             designation: experience.designation,
             companyName: experience.companyName,
             startYear: experience.startYear || null,
-            endYear: experience.endYear || null
+            endYear: experience.endYear || null,
+            description: experience.description || null
         };
         dataPacket.push(packet);
     });
@@ -56,7 +57,7 @@ export const insertData: RequestHandler = async (req: IRequest, res: IResponse, 
 }
 
 export const deleteData: RequestHandler = async (req: IRequest, res: IResponse, next: NextFunction) => {
-    const id = req.body.id;
+    const id = req.resumes.id;
 
     try {
         const response = await ExperienceModel.destroy({

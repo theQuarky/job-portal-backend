@@ -1,54 +1,61 @@
-import sequelize from '../config/db';
-import { INTEGER, STRING, FLOAT, TEXT } from 'sequelize';
-import { Model, Sequelize } from 'sequelize';
-import { DATE } from 'sequelize';
-import EducationModel from './EducationModel';
-import ExperienceModel from './ExperienceModel';
+import sequelize from "../config/db";
+import { INTEGER, STRING, FLOAT, TEXT } from "sequelize";
+import { Model, Sequelize } from "sequelize";
+import { DATE } from "sequelize";
+import EducationModel from "./EducationModel";
+import ExperienceModel from "./ExperienceModel";
 
+class ResumeModel extends Model {}
 
-class ResumeModel extends Model { }
-
-ResumeModel.init({
+ResumeModel.init(
+  {
     id: {
-        type: INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true
+      type: INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
     },
     fullName: {
-        type: STRING,
-        allowNull: false
+      type: STRING,
+      allowNull: false,
     },
     location: {
-        type: STRING,
-        allowNull: true
+      type: STRING,
+      allowNull: true,
+    },
+    skills: {
+      type: STRING,
+      allowNull: true,
     },
     experienceYear: {
-        type: INTEGER,
-        allowNull: true,
-        defaultValue: 0
+      type: INTEGER,
+      allowNull: true,
+      defaultValue: 0,
     },
     aboutYou: {
-        type: TEXT,
-        allowNull: false
+      type: TEXT,
+      defaultValue:'',
+      allowNull: true,
     },
-    addedBy:{
-        type:INTEGER,
-        allowNull:false
+    addedBy: {
+      type: INTEGER,
+      allowNull: false,
     },
     resumePath: {
-        type: STRING,
-        allowNull: true
+      type: STRING,
+      allowNull: true,
     },
-    isDel:{
-        type: INTEGER,
-        allowNull:true,
-        defaultValue:0
-    }
-}, {
+    isDel: {
+      type: INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+    },
+  },
+  {
     sequelize,
-    modelName: 'resumes',
-    tableName: 'resumes'
-});
+    modelName: "resumes",
+    tableName: "resumes",
+  }
+);
 
 export default ResumeModel;

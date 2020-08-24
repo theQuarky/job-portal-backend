@@ -4,4 +4,5 @@ export interface IExperience {
     companyName?: string;
     startYear?:number;
     endYear?: number;
+    description?: string;
 }
