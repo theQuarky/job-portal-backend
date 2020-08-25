@@ -26,6 +26,13 @@ export const sendLoginToken: express.RequestHandler = (req: IRequest, res: IResp
     });
 }
 
+export const changePassword: express.RequestHandler = (req:IRequest, res:IResponse, next:express.NextFunction)=> {
+    console.log(req.employer);
+    return res.send({
+        message: "password changed successfully!!"
+    });
+}
+
 export const avatarPath: express.RequestHandler = (req: IRequest, res: IResponse, next: express.NextFunction) =>{
     return res.json({
         msg: req.candidate.avatar

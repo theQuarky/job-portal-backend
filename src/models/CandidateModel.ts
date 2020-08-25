@@ -31,6 +31,11 @@ CandidateModel.init({
         type: STRING,
         allowNull: true
     },
+    aboutUs:{
+        type:STRING,
+        allowNull:true,
+        defaultValue:""
+    },
     isDel: {
         type: INTEGER,
         defaultValue: 0

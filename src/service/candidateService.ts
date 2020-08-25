@@ -203,6 +203,57 @@ export const addCandidate: express.RequestHandler = async (req: IRequest, res: I
     }
 }
 
+export const confirmId: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    if (params.id.toString() !== req.data.candidate.id.toString()) {
+        const err = new Error("Invalid request");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    return next();
+}
+
+export const checkPassword: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+
+    if (_.isEmpty(params.oldPassword)) {
+        const err = new Error("Old Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+
+    }
+    if (_.isEmpty(params.newPassword)) {
+        const err = new Error("New Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+
+    }
+    if (_.isEmpty(params.reNewPassword)) {
+        const err = new Error("ReType New Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+    if (params.newPassword.toString().trim() !== params.reNewPassword.toString().trim()) {
+        const err = new Error("ReType New Password required");
+        return res.send(Boom.boomify(err, { statusCode: 400 }));
+    }
+
+    const oldPassword = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.oldPassword.trim()).digest('hex');
+    try {
+        const response = await CandidateModel.findOne({
+            where: {
+                id: params.id,
+                password: oldPassword
+            }
+        });
+        if (_.isEmpty(response)) {
+            const err = new Error("Entered wrong password!!");
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        } else {
+            return next();
+        }
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
+    }
+}
+
 export const validLoginCredentials: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params = _.merge(req.body, req.params);
 
@@ -243,7 +294,7 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
                 ],
                 isDel: 0
             },
-            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName","avatar"]
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName","avatar","aboutUs"]
 
         });
         if (_.isEmpty(data)) {
@@ -256,6 +307,24 @@ export const validLoginCredentials: express.RequestHandler = async (req: IReques
         console.log(error);
         const err = new Error("server side error");
         return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const changePassword: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params: any = _.merge(req.params, req.body);
+    const password = crypto.createHmac('sha256', CONFIG.SHA_KEY).update(params.newPassword.trim()).digest('hex');
+    try {
+        const response = CandidateModel.update({
+            password
+        }, {
+            where: {
+                id: params.id
+            }
+        });
+        return next();
+    } catch (error) {
+        console.log(error)
+        return res.send(Boom.boomify(error, { statusCode: 500 }));
     }
 }
 
@@ -331,7 +400,8 @@ export const updateCandidate: express.RequestHandler = async (req: IRequest, res
         fullName: params.fullName,
         userName: params.userName,
         phoneNumber: params.phoneNumber,
-        emailId: params.emailId
+        emailId: params.emailId,
+        aboutUs: params.aboutUs
     };
 
     try {
@@ -387,9 +457,34 @@ export const getAllCandidate: express.RequestHandler = async (req: IRequest, res
                 isDel: 0
             },
             offset: parseInt(fromLimit),
-            limit: parseInt(toLimit)
+            limit: parseInt(toLimit),
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName", "avatar", "aboutUs"]
         });
         req.candidate = data;
+        return next();
+    } catch (error) {
+        console.log(error);
+        const err = new Error("server side error");
+        return res.send(Boom.boomify(err, { statusCode: 500 }));
+    }
+}
+
+export const getCandidateById: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
+    const params = _.merge(req.params, req.body, req.query);
+
+    try {
+        const data: ICandidate[] | any = await CandidateModel.findAll({
+            where: {
+                isDel: 0,
+                id: params.id
+            },
+            attributes: ["id", "fullName", "emailId", "phoneNumber", "userName", "avatar", "aboutUs"]
+        });
+        if (_.isEmpty(data)) {
+            const err = new Error(`Candidate with id ${params.id} is not exist`);
+            return res.send(Boom.boomify(err, { statusCode: 400 }));
+        }
+        req.candidate = data[0];
         return next();
     } catch (error) {
         console.log(error);

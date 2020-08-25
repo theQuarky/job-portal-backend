@@ -339,7 +339,6 @@ export const deleteEmployer: express.RequestHandler = async (req: IRequest, res:
 
 export const confirmId: express.RequestHandler = async (req: IRequest, res: IResponse, next: express.NextFunction) => {
     const params: any = _.merge(req.params, req.body);
-    console.log(req.data);
     if (params.id.toString() !== req.data.employer.id.toString()) {
         const err = new Error("Invalid request");
         return res.send(Boom.boomify(err, { statusCode: 400 }));

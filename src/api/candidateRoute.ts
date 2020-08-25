@@ -34,13 +34,27 @@ candidate.get('/',[
     candidateController.sendCandidate
 ]);
 
-candidate.put('/', authentication,[
+candidate.get('/:id',[
+    candidateService.getCandidateById,
+    candidateController.sendCandidate
+]);
+
+candidate.put('/changePassword/:id',authentication,[
+    candidateService.checkPassword,
+    candidateService.changePassword,
+    candidateController.changePassword
+]);
+
+candidate.put('/:id', authentication,[
     candidateService.checkLoginType,
+    candidateService.confirmId,
     candidateService.validateDataForUpdate,
     candidateService.findCandidateByEmailForUpdate,
     candidateService.findCandidateByPhoneNumberForUpdate,
     candidateService.updateCandidate,
-    candidateController.sendCandidate
+    candidateService.getCandidateById,
+    candidateService.generateToken,
+    candidateController.sendLoginToken
 ]);
 
 candidate.delete('/',authentication,[
