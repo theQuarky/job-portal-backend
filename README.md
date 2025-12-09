@@ -57,8 +57,8 @@ A production-ready RESTful API backend for a comprehensive job portal platform. 
 
 **Runtime & Framework:**
 - Node.js
-- Express.js 4.17
-- TypeScript 3.7
+- Express.js 4.17.1
+- TypeScript 3.7.5
 
 **Database:**
 - MySQL 2.18
@@ -83,7 +83,6 @@ A production-ready RESTful API backend for a comprehensive job portal platform. 
 **Logging & Monitoring:**
 - Winston (logging)
 - Morgan (HTTP request logging)
-- Mongoose-morgan
 
 **Development Tools:**
 - Nodemon (development server)
@@ -309,7 +308,7 @@ npm run clean
 - CORS is enabled - configure allowed origins for production
 - JWT tokens expire based on `JWT_EXPIRATION` setting (default: 1 hour)
 - All passwords are hashed using bcrypt before storage
-- Admin credentials are currently hardcoded - implement proper admin user management for production
+- Ensure proper admin authentication and authorization mechanisms are configured
 
 ### Deployment Platforms
 - The `Procfile` is included for Heroku deployment
